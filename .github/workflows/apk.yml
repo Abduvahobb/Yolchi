@@ -1,0 +1,70 @@
+name: APK yasash
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['index.html', '.github/workflows/apk.yml']
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Android SDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0"
+      - name: Ilovani tayyorlash
+        run: |
+          mkdir app && cd app
+          npm init -y >/dev/null
+          npm i @capacitor/core@6.2.0 @capacitor/cli@6.2.0 @capacitor/android@6.2.0 three@0.128.0 --no-audit --no-fund
+          mkdir www
+          cp ../index.html www/index.html
+          cp node_modules/three/build/three.min.js www/three.min.js
+          sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js#three.min.js#' www/index.html
+          grep -q 'src="three.min.js"' www/index.html
+          cat > capacitor.config.json <<'JSON'
+          {"appId":"uz.yolchi.game","appName":"Yo‘lchi","webDir":"www","android":{"allowMixedContent":false}}
+          JSON
+          npx cap add android
+          npx cap sync android
+      - name: Ruxsat va ikonka
+        run: |
+          python3 -m pip install --break-system-packages --quiet pillow
+          python3 - <<'PY'
+          import base64,io,re,glob,os,shutil
+          from PIL import Image
+          html=open('index.html',encoding='utf8').read()
+          b=re.search(r'rel="apple-touch-icon"[^>]*href="data:image/png;base64,([^"]+)"',html).group(1)
+          img=Image.open(io.BytesIO(base64.b64decode(b))).convert('RGB')
+          res='app/android/app/src/main/res'
+          shutil.rmtree(res+'/mipmap-anydpi-v26',ignore_errors=True)
+          for d,n in {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}.items():
+              for f in ['ic_launcher.png','ic_launcher_round.png','ic_launcher_foreground.png']:
+                  img.resize((n,n),Image.LANCZOS).save(f'{res}/mipmap-{d}/{f}')
+          p='app/android/app/src/main/AndroidManifest.xml'
+          m=open(p,encoding='utf8').read()
+          add='<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n'
+          m=m.replace('<uses-permission android:name="android.permission.INTERNET" />',add+'    <uses-permission android:name="android.permission.INTERNET" />')
+          assert 'RECORD_AUDIO' in m
+          open(p,'w',encoding='utf8').write(m)
+          PY
+      - name: APK yig'ish
+        run: |
+          cd app/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          mkdir -p ../../out
+          cp app/build/outputs/apk/debug/app-debug.apk ../../out/Yolchi.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Yolchi-APK
+          path: out/Yolchi.apk
