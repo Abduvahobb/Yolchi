@@ -8,6 +8,8 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -68,3 +70,8 @@ jobs:
         with:
           name: Yolchi-APK
           path: out/Yolchi.apk
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ github.run_number }}-${{ github.run_attempt }}" out/Yolchi.apk --title "Yolchi" --notes "Yolchi oyini" --latest --repo "$GITHUB_REPOSITORY"
