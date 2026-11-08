@@ -51,7 +51,7 @@ jobs:
               b=re.search(r'rel="apple-touch-icon"[^>]*href="data:image/png;base64,([^"]+)"',html).group(1)
               img=Image.open(io.BytesIO(base64.b64decode(b))).convert('RGBA')
           res='app/android/app/src/main/res'
-          BG=(20,48,111,255)
+          BG=(59,43,214,255)
           def circ(im):
               n=im.size[0];m=Image.new('L',(n,n),0);ImageDraw.Draw(m).ellipse((0,0,n-1,n-1),fill=255);o=Image.new('RGBA',(n,n),(0,0,0,0));o.paste(im,(0,0),m);return o
           for d,n in {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}.items():
@@ -66,7 +66,7 @@ jobs:
           for nm in ['ic_launcher.xml','ic_launcher_round.xml']:
               open(f'{res}/mipmap-anydpi-v26/{nm}','w').write(ad)
           os.makedirs(f'{res}/values',exist_ok=True)
-          open(f'{res}/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#14306F</color>\n</resources>\n')
+          open(f'{res}/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#3B2BD6</color>\n</resources>\n')
           p='app/android/app/src/main/AndroidManifest.xml'
           m=open(p,encoding='utf8').read()
           add='<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n'
