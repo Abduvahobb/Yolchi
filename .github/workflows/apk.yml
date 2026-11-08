@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['index.html', '.github/workflows/apk.yml']
+    paths: ['index.html', 'icon.png', '.github/workflows/apk.yml']
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -42,20 +42,36 @@ jobs:
         run: |
           python3 -m pip install --break-system-packages --quiet pillow
           python3 - <<'PY'
-          import base64,io,re,glob,os,shutil
-          from PIL import Image
-          html=open('index.html',encoding='utf8').read()
-          b=re.search(r'rel="apple-touch-icon"[^>]*href="data:image/png;base64,([^"]+)"',html).group(1)
-          img=Image.open(io.BytesIO(base64.b64decode(b))).convert('RGB')
+          import base64,io,re,os,shutil
+          from PIL import Image,ImageDraw
+          if os.path.exists('icon.png'):
+              img=Image.open('icon.png').convert('RGBA')
+          else:
+              html=open('index.html',encoding='utf8').read()
+              b=re.search(r'rel="apple-touch-icon"[^>]*href="data:image/png;base64,([^"]+)"',html).group(1)
+              img=Image.open(io.BytesIO(base64.b64decode(b))).convert('RGBA')
           res='app/android/app/src/main/res'
-          shutil.rmtree(res+'/mipmap-anydpi-v26',ignore_errors=True)
+          BG=(20,48,111,255)
+          def circ(im):
+              n=im.size[0];m=Image.new('L',(n,n),0);ImageDraw.Draw(m).ellipse((0,0,n-1,n-1),fill=255);o=Image.new('RGBA',(n,n),(0,0,0,0));o.paste(im,(0,0),m);return o
           for d,n in {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}.items():
-              for f in ['ic_launcher.png','ic_launcher_round.png','ic_launcher_foreground.png']:
-                  img.resize((n,n),Image.LANCZOS).save(f'{res}/mipmap-{d}/{f}')
+              os.makedirs(f'{res}/mipmap-{d}',exist_ok=True)
+              s=img.resize((n,n),Image.LANCZOS)
+              s.save(f'{res}/mipmap-{d}/ic_launcher.png')
+              circ(s).save(f'{res}/mipmap-{d}/ic_launcher_round.png')
+              f=int(n*108/48);fg=Image.new('RGBA',(f,f),(0,0,0,0));k=int(f*72/108)+2;ic=img.resize((k,k),Image.LANCZOS);fg.paste(ic,((f-k)//2,(f-k)//2),ic)
+              fg.save(f'{res}/mipmap-{d}/ic_launcher_foreground.png')
+          os.makedirs(f'{res}/mipmap-anydpi-v26',exist_ok=True)
+          ad='<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n  <background android:drawable="@color/ic_launcher_background"/>\n  <foreground android:drawable="@mipmap/ic_launcher_foreground"/>\n</adaptive-icon>\n'
+          for nm in ['ic_launcher.xml','ic_launcher_round.xml']:
+              open(f'{res}/mipmap-anydpi-v26/{nm}','w').write(ad)
+          os.makedirs(f'{res}/values',exist_ok=True)
+          open(f'{res}/values/ic_launcher_background.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#14306F</color>\n</resources>\n')
           p='app/android/app/src/main/AndroidManifest.xml'
           m=open(p,encoding='utf8').read()
           add='<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n'
-          m=m.replace('<uses-permission android:name="android.permission.INTERNET" />',add+'    <uses-permission android:name="android.permission.INTERNET" />')
+          if 'RECORD_AUDIO' not in m:
+              m=m.replace('<uses-permission android:name="android.permission.INTERNET" />',add+'    <uses-permission android:name="android.permission.INTERNET" />')
           assert 'RECORD_AUDIO' in m
           open(p,'w',encoding='utf8').write(m)
           PY

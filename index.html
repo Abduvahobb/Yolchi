@@ -122,6 +122,39 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--anor);outline-o
 #flyO p{margin:0;font-weight:700;text-shadow:0 2px 0 var(--siyoh)}
 #flyBar{width:min(80vw,320px);height:14px;border:3px solid var(--siyoh);border-radius:9px;background:#fff;overflow:hidden}#flyBar i{display:block;height:100%;width:0;background:var(--oltin);transition:width .3s}
 @media (prefers-reduced-motion:reduce){.card,#stamp:not([hidden]),.item,#ctxBtn,.bump{animation:none}}
+
+#acts{display:block;width:250px;height:250px;pointer-events:none}
+#acts .act{position:absolute;pointer-events:auto}
+#jump{right:0;bottom:0;width:88px;height:88px;font-size:16px}
+#atkBtn{right:98px;bottom:2px;width:76px;height:76px;background:#d8344f;color:#fff}
+#carBtn{right:6px;bottom:100px;width:66px;height:66px;font-size:13px;background:#12a5b5;color:#fff}
+#ctxBtn{right:88px;bottom:90px}
+#talkBtn{right:178px;bottom:18px;width:62px;height:62px;font-size:12.5px}
+#wpnBtn{right:176px;bottom:94px;width:58px;height:58px;font-size:11px;line-height:1.1;background:#fffdf6}
+#bailBtn{right:8px;bottom:180px;width:60px;height:60px;font-size:12px;background:#2fa35a;color:#fff}
+@media (orientation:landscape) and (max-height:480px){#acts{transform:scale(.82);transform-origin:bottom right}}
+#mGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
+#mGrid .mbtn{width:100%;height:64px;font-size:14px}
+#wantC{background:#10204a;color:#ffd34d;letter-spacing:1px}
+#hurt{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(transparent 50%,#d8344fc0);opacity:0;transition:opacity .25s}
+#start{align-items:flex-end;background:linear-gradient(#10204a00 22%,#10204ae0 46%)}
+#sbox{max-height:72vh;overflow:auto;gap:7px}
+#sbox h1{font-size:clamp(40px,12vw,64px)}
+#sub{font-size:14px}
+#form{gap:7px;padding:10px}
+.srow{display:flex;align-items:center;gap:8px;text-align:left}
+.srow>b{width:62px;flex:none;font-size:13px;color:var(--siyoh)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.chips button{border:2px solid var(--siyoh);border-radius:10px;background:#fff;font:700 12.5px var(--body),sans-serif;padding:3px 8px;color:var(--siyoh)}
+.chips button.sel{background:var(--oltin);box-shadow:0 0 0 2px var(--anor)}
+.chips button.sw{width:26px;height:26px;border-radius:50%;padding:0}
+.chips button.sw.sel{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--anor)}
+#pbar{display:flex;gap:8px}#pbar #play{flex:1}
+#howB{font:800 14px var(--body),sans-serif;border:3px solid var(--siyoh);border-radius:14px;background:#fffdf6;box-shadow:0 5px 0 var(--siyoh);padding:4px 10px}
+#howL{padding:12px 16px;overflow:auto;font-size:14.5px;line-height:1.4;font-weight:600}#howL b{color:#d8344f}
+#toast{top:calc(225px + env(safe-area-inset-top,0px))}
+@media (orientation:portrait){#keys{display:none}}
+@media (orientation:landscape) and (max-height:480px){#toast{top:calc(92px + env(safe-area-inset-top,0px))}#start{align-items:center;justify-content:flex-end}#sbox{max-height:94vh;width:min(100%,430px)}#sbox h1{font-size:34px}}
 </style>
 
 <canvas id="game" aria-label="O‘yin dunyosi"></canvas>
@@ -133,9 +166,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--anor);outline-o
       <div class="sticker chip" title="Muhrlar">Muhr <span id="nStamp">0/12</span></div>
       <div class="sticker chip" title="Tanga"><span style="color:#c98a00">●</span><span id="nCoin">0</span></div>
       <div class="sticker chip" title="Quvvat">Quvvat <span id="nEn">100%</span></div>
+      <div class="sticker chip" title="Jon">Jon <span id="nHp">100%</span></div>
       <div class="sticker chip" title="Hozir o‘yinda"><i id="onDot" class="dot"></i><span id="nOn">Yakka</span></div>
     </div>
     <div id="spd" class="sticker chip" hidden>0 km/s</div>
+    <div id="wantC" class="sticker chip" hidden></div>
     <div id="debtC" class="sticker chip" hidden>Qarz <span id="nDebt">0</span></div>
     <div id="quest" class="sticker chip"><i id="qArrow" style="font-style:normal">▲</i><span id="qText"></span></div>
   </div>
@@ -143,16 +178,40 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--anor);outline-o
 </div>
 
 <div id="side" hidden>
+  <button id="bMenu" class="sticker mbtn">Menyu</button>
   <button id="bWal" class="sticker mbtn">Hamyon</button>
   <button id="bJob" class="sticker mbtn">Ish</button>
-  <button id="bWorld" class="sticker mbtn">Dunyo</button>
-  <button id="bPass" class="sticker mbtn">Pasport</button>
-  <button id="bSay" class="sticker mbtn">Salom</button>
   <button id="bMic" class="sticker mbtn" hidden>Mikrofon</button>
-  <button id="bSnd" class="sticker mbtn">Ovoz bor</button>
 </div>
+<div id="menuP" class="panel" hidden><div class="card" style="width:min(100%,430px)">
+  <div class="chead"><h2>Menyu</h2><button class="x" data-close aria-label="Yopish">✕</button></div>
+  <div id="mGrid">
+   <button id="bMap" class="sticker mbtn">Xarita</button>
+   <button id="bWorld" class="sticker mbtn">Dunyo</button>
+   <button id="bPass" class="sticker mbtn">Pasport</button>
+   <button id="bSay" class="sticker mbtn">Salom</button>
+   <button id="bSnd" class="sticker mbtn">Ovoz bor</button>
+   <button id="bQ" class="sticker mbtn">Grafika</button>
+   <button id="bHow" class="sticker mbtn">Yordam</button>
+  </div>
+</div></div>
+<div id="howP" class="panel" hidden><div class="card" style="width:min(100%,520px)">
+  <div class="chead"><h2>Qanday o‘ynash</h2><button class="x" data-close aria-label="Yopish">✕</button></div>
+  <div id="howL">
+   <p><b>Yurish:</b> chap tomonni bosib suring. <b>Qarash:</b> o‘ng tomonni suring. Kompyuterda WASD, sichqoncha, Bo‘sh joy (sakrash), E (mashina), Q (urish/otish), R (qurol almashtirish), M (xarita).</p>
+   <p><b>Ish:</b> “Ish” tugmasi: kassir, kuryer, farrosh, avtobus, taksi. Bitta joyda 3 kishigacha birga ishlang, har bir sherik +20%.</p>
+   <p><b>Do‘stlar:</b> do‘st yoniga borib “Do‘st” tugmasini bosing: pul bering, oila quring. Do‘stning mashinasiga “Yo‘lovchi” bo‘lib o‘tiring (4 kishigacha).</p>
+   <p><b>Qurol:</b> Qurol do‘konidan pistolet yoki avtomat oling. “Qurol” tugmasi bilan almashtiring, qizil tugma bilan urasiz yoki otasiz.</p>
+   <p><b>Jinoyat:</b> odamlarni ursangiz, otsangiz yoki do‘konni o‘marsangiz, yulduzlar chiqadi va politsiya quvadi. Ushlasa, 29 daqiqa qamoq. Qamoqda “Kovlash” bilan tunnel qazib qochish yoki garov to‘lash mumkin.</p>
+   <p><b>Mashina urib ketsa:</b> odam o‘zi narx aytadi (1–10 000). To‘lamasangiz, qamalasiz.</p>
+   <p><b>Uy:</b> uy sotib olsangiz, ichida “Uxlash” mumkin: tong otadi, quvvat va jon to‘ladi.</p>
+  </div>
+</div></div>
 <div id="say" hidden></div>
 <div id="acts" hidden>
+  <button id="bailBtn" class="sticker act" hidden>Garov</button>
+  <button id="wpnBtn" class="sticker act" hidden>Qurol</button>
+  <button id="atkBtn" class="sticker act">Musht</button>
   <button id="ctxBtn" class="sticker act" hidden>Do‘kon</button>
   <button id="carBtn" class="sticker act" hidden>Mashina</button>
   <button id="talkBtn" class="sticker act" hidden>Gaplash</button>
@@ -206,15 +265,21 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--anor);outline-o
 
 <div id="start"><div id="sbox">
   <h1>YO‘LCHI</h1>
-  <p id="sub">O‘zbekiston bo‘ylab sayohat: 12 viloyat, 12 muhr, do‘stlar bilan birga</p>
+  <p id="sub">Ochiq dunyo: 7 davlat, ishlar, oila, mashinalar va do‘stlar bilan birga</p>
   <div id="form" class="sticker">
     <input id="name" maxlength="14" placeholder="Ismingiz" aria-label="Ismingiz" autocomplete="off">
-    <div id="cols" role="group" aria-label="Chopon rangi"></div>
-    <button id="play" disabled>Yuklanmoqda…</button>
+    <div class="srow"><b>Personaj</b><div id="pres" class="chips"></div></div>
+    <div class="srow"><b>Jinsi</b><div id="sexB" class="chips"></div></div>
+    <div class="srow"><b>Kiyim</b><div id="cols" class="chips"></div></div>
+    <div class="srow"><b>Teri</b><div id="skinB" class="chips"></div></div>
+    <div class="srow"><b>Bosh</b><div id="hatB" class="chips"></div></div>
+    <div class="srow"><b>Ko‘zoynak</b><div id="glB" class="chips"></div></div>
+    <div class="srow"><b>Grafika</b><div id="qB" class="chips"></div></div>
+    <div id="pbar"><button id="howB" type="button">Yordam</button><button id="play" disabled>Yuklanmoqda…</button></div>
   </div>
   <p id="keys">Telefon: chap tomonda yurish, o‘ng tomonda qarash. Kompyuter: WASD, sichqoncha, Bo‘sh joy, E, M.</p>
 </div></div>
-<div id="fade"></div>
+<div id="fade"></div><div id="hurt"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -643,7 +708,7 @@ function hipRoof(s,A,E,Y,rh,col){const kr=rgb(col),R0=Math.min(A,E),NX=12,NZ=10,
  for(let i=0;i<NX;i++)for(let j=0;j<NZ;j++){const a=P(i,j),b=P(i+1,j),c=P(i+1,j+1),d=P(i,j+1),m=(i+j)%2?.94:1.02;s.quadN(a[0],d[0],c[0],b[0],a[1],d[1],c[1],b[1],kr,m,m)}}
 function buildHouse(x,y,z,w,d,ry,k,rnd,F,city){F=Math.max(1,F|0);const s=sec(x,z),H=F*FH,T0=.5,W_=w/2,D=d/2,dw=4.2,apt=F>3,sideW=(w-dw)/2;
  const trim=[0xfdf6e3,0xf3e9d2,0x2d9fb7,0x1a67a9,0xd8344f,0x394656][Math.floor(rnd()*6)],inner=[0xf6ecd8,0xeaf1ea,0xf3e3d2,0xe6eef4][Math.floor(rnd()*4)],frame=apt?0x3a4250:[0xffffff,0x2b3a55,0x6b4a2e][Math.floor(rnd()*3)];
- regionMix(x,z);at(x,y,z,ry);
+ const modern=apt&&rnd()<.45;regionMix(x,z);at(x,y,z,ry);
  s.rbox(0,-.5,0,w+1.4,.46,d+1.4,0xb9b4a8,.8,0xc9c4b8);s.box(0,-.3,0,w-.6,.31,d-.6,0xb08a5c);s.box(0,-.4,D+1.9,dw+1.6,.44,3.6,0xc9c4b8,0xd6d1c6);
  s.box(0,0,-D+T0/2,w,H,T0,k);s.box(-W_+T0/2,0,0,T0,H,d-2*T0,k);s.box(W_-T0/2,0,0,T0,H,d-2*T0,k);
  s.box(-(dw/2+sideW/2),0,D-T0/2,sideW,H,T0,k);s.box(dw/2+sideW/2,0,D-T0/2,sideW,H,T0,k);s.box(0,4,D-T0/2,dw,H-4,T0,k);s.under(0,4,D-T0/2,dw,T0,k);
@@ -654,7 +719,7 @@ function buildHouse(x,y,z,w,d,ry,k,rnd,F,city){F=Math.max(1,F|0);const s=sec(x,z
  [-1,1].forEach(q=>{s.ell(q*(dw/2+1.1),2.9,D+.25,.2,.28,.2,0xfff1b0,8,4);s.glow(q*(dw/2+1.1),2.62,D+.5,.55,.55)});
  // derazalar
  const facs=[[0,D,0,w],[0,-D,Math.PI,w],[W_,0,Math.PI/2,d],[-W_,0,-Math.PI/2,d]],cs=Math.cos(ry),sn=Math.sin(ry);
- facs.forEach((f,fi)=>{const ox=f[0],oz=f[1];at(x+ox*cs+oz*sn,y,z-ox*sn+oz*cs,ry+f[2]);const len=f[3],sl=winSlots(len-1.6,apt?3.6:5.2),ww=apt?2.5:2.3,wh=apt?2.6:2.5;
+ facs.forEach((f,fi)=>{const ox=f[0],oz=f[1];at(x+ox*cs+oz*sn,y,z-ox*sn+oz*cs,ry+f[2]);const len=f[3],sl=winSlots(len-1.6,apt?3.6:5.2),ww=apt?2.5:2.3,wh=apt?2.6:2.5;if(modern){for(let q=0;q<F;q++){const y0=q*FH+.5,hh=FH-.9,lit0=(q+fi+Math.round(x))%3;if(fi===0&&q===0){const a1=-dw/2-.7,b0=dw/2+.7,e0=-len/2+.7,e1=len/2-.7;s.winZ((e0+a1)/2,y0,.09,a1-e0,hh);s.winZ((b0+e1)/2,y0,.09,e1-b0,hh)}else{s.winZ(0,y0,.09,len-1.4,hh);if(lit0)s.glow(0,y0,.11,len-1.4,hh)}s.fq(-len/2+.6,q*FH-.05,len/2-.6,q*FH+.5,.07,frame)}for(let xx=-len/2+3.2;xx<len/2-1;xx+=3.2){if(fi===0&&Math.abs(xx)<dw/2+.6)s.fq(xx-.08,FH,xx+.08,H,.12,frame);else s.fq(xx-.08,0,xx+.08,H,.12,frame)}s.fq(-len/2+.4,H-.6,len/2-.4,H-.25,.14,0x38bdf8);s.glow(0,H-.6,.16,len-.8,.35);return}
   for(let q=0;q<F;q++){const y0=q*FH+1.2,lit0=(q*7+fi*3+Math.round(x))%3;
    sl.forEach((xx,si)=>{if(fi===0&&q===0&&Math.abs(xx)<dw/2+1.7)return;
     s.fq(xx-ww/2-.2,y0-.2,xx+ww/2+.2,y0+wh+.2,.05,frame);s.winZ(xx,y0,.09,ww,wh);if(lit0&&(si+q+lit0)%2===0)s.glow(xx,y0,.11,ww,wh);
@@ -668,14 +733,14 @@ function buildHouse(x,y,z,w,d,ry,k,rnd,F,city){F=Math.max(1,F|0);const s=sec(x,z
  // butalar
  [-1,1].forEach(q=>s.ell(q*(W_-1.8),.55,D+1.8,1.3,1,1,q>0?0x4f9f3f:0x5cb84a,7,4));
  solid(0,-D+T0/2,w,T0,H+40);solid(-W_+T0/2,0,T0,d,H+40);solid(W_-T0/2,0,T0,d,H+40);solid(-(dw/2+sideW/2),D-T0/2,sideW,T0,H+40);solid(dw/2+sideW/2,D-T0/2,sideW,T0,H+40);
- const sw=Math.abs(O.s)>.7,hx=(sw?d:w)/2-T0,hz=(sw?w:d)/2-T0,h={x,z,y,hx,hz,H,F,FH,w,d,ry,city,k,trim,inner,seed:Math.floor(rnd()*1e6),door:{x:x+D*O.s,z:z+D*O.c,fx:O.s,fz:O.c}};houses.push(h);
+ const sw=Math.abs(O.s)>.7,hx=(sw?d:w)/2-T0,hz=(sw?w:d)/2-T0,h={x,z,y,hx,hz,H,F,FH,w,d,ry,city,k,trim,inner,modern,seed:Math.floor(rnd()*1e6),door:{x:x+D*O.s,z:z+D*O.c,fx:O.s,fz:O.c}};houses.push(h);
  for(let i=Math.floor((x-hx)/CH);i<=Math.floor((x+hx)/CH);i++)for(let j=Math.floor((z-hz)/CH);j<=Math.floor((z+hz)/CH);j++){const q=i*73856093^j*19349663;let b=houseHash.get(q);if(!b){b=[];houseHash.set(q,b)}b.push(h)}
  at(0,0,0,0);return h}
 const wallC=rnd=>{const a=W.style.walls;return a[Math.floor(rnd()*a.length)]};
 function siteOk(x,y,z,w,ry){const r=w/2+1,fx=Math.sin(ry),fz=Math.cos(ry);for(const q of [[r,r],[r,-r],[-r,r],[-r,-r],[0,0]])if(Math.abs(heightAt(x+q[0],z+q[1])-y)>.7)return false;return !collides(x+fx*(r+6),z+fz*(r+6),2.5,2.5)&&roadAt(x+fx*(r+6),z+fz*(r+6)).d>2}
 function yardTree(x,y,z,w,ry,rnd){const off=(rnd()<.5?1:-1)*(w/2+3.6),tx=x+Math.cos(ry)*off,tz=z-Math.sin(ry)*off;if(!collides(tx,tz,1.2,1.2)&&roadAt(tx,tz).d>16&&Math.abs(heightAt(tx,tz)-y)<1){WIND=.035;at(tx,y,tz,0);const fl=R[regionAt(tx,tz).i].flora.filter(f=>Flora[f]&&['apple','poplar','palm','sakura','cypress','olive','mulberry','pine'].includes(f));Flora[fl[0]||'apple'](sec(tx,tz),1.3);WIND=0}}
 function addFlag(x,y,z){const s=sec(x,z);at(x,y,z,0);s.box(0,0,0,.35,17,.35,0xe2e6ec);s.lathe(0,17,0,[[.3,0],[0,.5]],0xf7c744,6);WIND=.14;const f=W.flag;f.forEach((c,i)=>s.box(3.4,16.2-i*1.35,0,6.2,1.35,.1,c));WIND=0;solid(0,0,.8,.8)}
-const STORES={food:{n:'SAVATCHA',sub:'Supermarket',c:0x2f9e4f,c2:0xef7a2a,cat:[0],pr:[0xd8344f,0xf7b81f,0x2fa35a,0xef7a2a,0xfafafa,0x8a5a34]},phone:{n:'TELEFON MARKAZI',c:0x2d67bb,c2:0xeef2f5,cat:[2],pr:[0x15171f,0x3a4152,0xd9dee6,0x2d67bb]},clothes:{n:'KIYIM',c:0xc93f7a,c2:0xfafafa,cat:[1],pr:[0xc93f7a,0x16347a,0xf7b81f,0x12a5b5,0xfafafa,0x1f2433]},auto:{n:'AVTOSALON',c:0x394656,c2:0xd8344f,cat:[3],pr:[0xd8344f,0xfafafa,0x2d67bb,0x1f2433]},home:{n:'UY-JOY VA MEBEL',c:0xb9772e,c2:0xfff3d6,cat:[4],pr:[0x8a5a34,0xc98d4c,0xd8c9ac,0x5f6b7a]},pets:{n:'HAYVONLAR',c:0x7a4fd0,c2:0xf7b81f,cat:[5],pr:[0xef9a4a,0xb98347,0xfafafa,0x7c4a26]},serv:{n:'XIZMATLAR',c:0x12a5b5,c2:0xfafafa,cat:[6],pr:[0xfafafa,0x12a5b5,0xd8344f]},gift:{n:'SOVG‘ALAR',c:0xd8344f,c2:0xf7c744,cat:[7,8],pr:[0xf7c744,0xd8344f,0xe85aa5,0x7a4fd0,0x12a5b5]}};
+const STORES={food:{n:'SAVATCHA',sub:'Supermarket',c:0x2f9e4f,c2:0xef7a2a,cat:[0],pr:[0xd8344f,0xf7b81f,0x2fa35a,0xef7a2a,0xfafafa,0x8a5a34]},phone:{n:'TELEFON MARKAZI',c:0x2d67bb,c2:0xeef2f5,cat:[2],pr:[0x15171f,0x3a4152,0xd9dee6,0x2d67bb]},clothes:{n:'KIYIM',c:0xc93f7a,c2:0xfafafa,cat:[1],pr:[0xc93f7a,0x16347a,0xf7b81f,0x12a5b5,0xfafafa,0x1f2433]},auto:{n:'AVTOSALON',c:0x394656,c2:0xd8344f,cat:[3],pr:[0xd8344f,0xfafafa,0x2d67bb,0x1f2433]},home:{n:'UY-JOY VA MEBEL',c:0xb9772e,c2:0xfff3d6,cat:[4],pr:[0x8a5a34,0xc98d4c,0xd8c9ac,0x5f6b7a]},pets:{n:'HAYVONLAR',c:0x7a4fd0,c2:0xf7b81f,cat:[5],pr:[0xef9a4a,0xb98347,0xfafafa,0x7c4a26]},serv:{n:'XIZMATLAR',c:0x12a5b5,c2:0xfafafa,cat:[6],pr:[0xfafafa,0x12a5b5,0xd8344f]},guns:{n:'QUROL DO‘KONI',c:0x3a3f48,c2:0xf7b81f,cat:[8],pr:[0x22262e,0x4a5060,0x6b4a2e,0x2a2d35,0x7a8290]},gift:{n:'SOVG‘ALAR',c:0xd8344f,c2:0xf7c744,cat:[7,9],pr:[0xf7c744,0xd8344f,0xe85aa5,0x7a4fd0,0x12a5b5]}};
 function buildStore(x,y,z,ry,type){const S0=STORES[type],s=sec(x,z),w=34,d=24,H=9,th=.6,dw=7;regionMix(x,z);at(x,y,z,ry);s.box(1.8,-.14,-1.8,w+1.6,.18,d+1.6,colC.setRGB(mix.r*.7,mix.g*.7,mix.b*.7).getHex());s.box(0,-.25,0,w,.32,d,0xd9d6cc,0xe9e6dd);
  const side=(w-dw)/2;s.box(0,0,-d/2+th/2,w,H,th,0xe9e6dd);s.box(-w/2+th/2,0,0,th,H,d-2*th,0xe9e6dd);s.box(w/2-th/2,0,0,th,H,d-2*th,0xe9e6dd);
  [-1,1].forEach(q=>{const cx=q*(dw/2+side/2);s.box(cx,0,d/2-th/2,side,1,th,S0.c);s.box(cx,1,d/2-th/2,side,5,.25,0x9ad4e8);s.glow(cx,1,d/2-.15,side,5);for(let i=0;i<=3;i++)s.box(cx-side/2+i*side/3,1,d/2-th/2,.25,5,.4,0xc4ccd4)});
@@ -715,8 +780,13 @@ function buildCity(c,rnd){const b=sec(c.x,c.z),nearLM=(x,z,r)=>Math.hypot(x-c.lx
  lots.sort((a,b)=>a.dc-b.dc);const used=new Set();
  const ab=blocks.filter(q=>q.lots.length===2&&Math.hypot(q.x-c.x,q.z-c.z)>110).sort((a,b)=>Math.hypot(b.x-c.x,b.z-c.z)-Math.hypot(a.x-c.x,a.z-c.z))[0];if(ab){ab.lots.forEach(l=>used.add(l));buildAzs(ab.x,c.h,ab.z)}
  const free=lots.filter(l=>!used.has(l));
- ['food','phone','clothes','auto','home','pets','serv','gift'].forEach(ty=>{const q=free.shift();if(q)buildStore(q.x,c.h,q.z,q.ry,ty)});
+ ['food','phone','clothes','auto','home','pets','serv','gift','guns'].forEach(ty=>{const q=free.shift();if(q)buildStore(q.x,c.h,q.z,q.ry,ty)});
  const sky=!!c.sky;free.forEach(q=>{const apt=q.dc<190&&rnd()<(q.dc<150?.8:.45);if(apt){const F=sky?10+Math.floor(rnd()*12):4+Math.floor(rnd()*5),w=Math.round(42+rnd()*12),d=Math.round(24+rnd()*3);buildHouse(q.x-q.fx*(d/2-12),c.h,q.z-q.fz*(d/2-12),w,d,q.ry,wallC(rnd),rnd,F,c)}else[-1,1].forEach(s2=>{const w=Math.round(22+rnd()*3),d=Math.round(20+rnd()*4),ax=q.fz*s2*13.4,az=-q.fx*s2*13.4;buildHouse(q.x+ax-q.fx*(d/2-12),c.h,q.z+az-q.fz*(d/2-12),w,d,q.ry,wallC(rnd),rnd,2+Math.floor(rnd()*2),c)})});
+ // bekatlar va reklama
+ {const ss=roadSamples.filter(a=>a[0].cid===c.id&&a.length>10);let nb=0;ss.forEach((a,ai)=>{if(nb>=8)return;const p=a[Math.floor(a.length/2)+(ai%3)-1];if(!p||p.cross)return;const sd=ai%2?1:-1,o=p.w+3.4,x=p.x-p.tz*o*sd,z=p.z+p.tx*o*sd;if(collides(x,z,2.6,2.6)||houseAt(x,z))return;at(x,c.h+.32,z,Math.atan2(p.tz*sd,-p.tx*sd));const s=sec(x,z);
+  if(nb%2===0){s.rbox(0,2.7,0,4.6,.18,1.8,0x2d67bb,.3,0x38bdf8);[-2,2].forEach(q=>s.lathe(q,0,-.6,[[.07,0],[.07,2.7]],0xb9bfc7,6));s.winZ(0,.3,-.75,4.2,2.3,true);s.soft(0,.55,-.35,3.8,.15,.6,0xd9b382,.05);s.fq(-2.1,2.2,-.9,2.6,-.74,0xf7b81f);s.glow(0,2.55,0,4,.12);solid(0,-.6,4.6,.5,3)}
+  else{[-2.4,2.4].forEach(q=>s.lathe(q,0,0,[[.14,0],[.12,5]],0x3a3f48,6));s.rbox(0,5,0,6.2,3.4,.45,0x22262e,.15);s.fq(-2.8,5.2,2.8,8.2,.24,[0xd8344f,0x2d67bb,0x2fa35a,0xf7b81f,0x7a4fd0][ai%5]);s.fq(-2.2,6.2,2.2,7.2,.25,0xffffff);s.glow(0,5.2,.27,5.6,3);solid(0,0,5.4,.6,8)}
+  at(0,0,0,0);nb++})}
  // svetoforlar
  for(let kx=-2;kx<=2;kx++)for(let kz=-2;kz<=2;kz++){const px=c.x+kx*CSP,pz=c.z+kz*CSP;if(!streetsAt(px,pz))continue;[[1,1],[-1,-1]].forEach(sg=>{const x=px+sg[0]*(CW+3.2),z=pz+sg[1]*(CW+3.2),s=sec(x,z);at(x,c.h+.32,z,0);s.lathe(0,0,0,[[.16,0],[.12,6.2]],0x2c3038,6);s.rbox(0,4.5,0,.8,1.7,.8,0x22262e,.25);s.rbox(0,2.5,0,.8,1.7,.8,0x22262e,.25);solid(0,0,.5,.5,7);at(0,0,0,0);
   const y=c.h+.32;[-1,1].forEach(q=>{TLB.hR.ell(x+q*.42,y+5.8,z,.12,.26,.26,0xffffff,8,4);TLB.hG.ell(x+q*.42,y+4.95,z,.12,.26,.26,0xffffff,8,4);TLB.vR.ell(x,y+3.8,z+q*.42,.26,.26,.12,0xffffff,8,4);TLB.vG.ell(x,y+2.95,z+q*.42,.26,.26,.12,0xffffff,8,4)})})}
@@ -782,8 +852,8 @@ const water=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({map:wat
 const COLS=[0xd8344f,0x12a5b5,0xf7b81f,0x7a4fd0,0x2fa35a,0xef7a2a,0x1f2433,0xf5f5f0,0xd9a514,0xe85aa5,0x38bdf8,0x7c4a26];
 const charCache={},shadowGeo=new T.CircleGeometry(.75,10),shadowMat=new T.MeshBasicMaterial({color:0x10204a,transparent:true,opacity:.14,depthWrite:false});
 function hullOf(geo){return new T.Mesh(geo,outlineMat)}
-function charGeos(ci,st,o){o=o||{};const hat0=o.h===undefined?(st===2?0:-1):o.h,key=[ci,st,hat0,o.g||0,o.p||0].join('_');if(charCache[key])return charCache[key];const c=COLS[ci],second=[0xffffff,0x16347a,0xf7b81f][ci%3],third=[0xf7b81f,0xffffff,0x16347a][ci%3];const sw=WIND;WIND=0;at(0,0,0,0);
- const skin=[0xf1c49a,0xe5b184,0xf4cfa9][ci%3],body=new B(),head=new B(),hat=hat0,pants=st===1?c:[0x263a6e,0x3b3f4a,0x5b4632][ci%3],hc=[0x2a1a12,0x4a2c17,0x151515,0x3a2a1c][ci%4];
+function charGeos(ci,st,o){o=o||{};const hat0=o.h===undefined?(st===2?0:st===1&&ci%2===0?8:-1):o.h,key=[ci,st,hat0,o.g||0,o.p||0,o.sk===undefined?-1:o.sk].join('_');if(charCache[key])return charCache[key];const c=COLS[ci],second=[0xffffff,0x16347a,0xf7b81f][ci%3],third=[0xf7b81f,0xffffff,0x16347a][ci%3];const sw=WIND;WIND=0;at(0,0,0,0);
+ const skin=[0xf1c49a,0xe5b184,0xf4cfa9,0xc98e62,0x8d5a3b][o.sk!==undefined?clamp(o.sk|0,0,4):ci%3],body=new B(),head=new B(),hat=hat0,pants=st===1?c:[0x263a6e,0x3b3f4a,0x5b4632][ci%3],hc=[0x2a1a12,0x4a2c17,0x151515,0x3a2a1c][ci%4];
  if(st===1){body.lathe(0,-.48,0,[[.66,0],[.62,.35],[.54,.8],[.47,1.25],[.36,1.62],[.2,1.76],[0,1.8]],(i,j)=>[c,second,third][Math.floor(j/2)%3],16)}
  else if(st===2){body.lathe(0,0,0,[[.46,0],[.5,.3],[.52,.6],[.47,.95],[.34,1.2],[.16,1.3],[0,1.32]],(i,j)=>Math.floor(j/2)%2?c:second,16);body.soft(0,.4,.47,.2,.85,.08,0xf7b81f,.035)}
  else{body.lathe(0,0,0,[[.42,0],[.47,.18],[.5,.5],[.49,.88],[.41,1.13],[.22,1.28],[0,1.32]],c,16);body.ell(0,1.1,.36,.22,.1,.08,0xf3f3f0,8,4);body.lathe(0,.04,0,[[.475,0],[.485,.14]],0x22262e,16);body.ell(0,.6,.48,.05,.05,.03,0xf3f3f0,6,3);body.ell(0,.85,.47,.05,.05,.03,0xf3f3f0,6,3)}
@@ -792,10 +862,11 @@ function charGeos(ci,st,o){o=o||{};const hat0=o.h===undefined?(st===2?0:-1):o.h,
  [-1,1].forEach(q=>{head.ell(q*.21,.5,.54,.13,.16,.1,0xffffff,10,6);head.ell(q*.21,.48,.615,.075,.095,.045,0x1d2238,8,5);head.ell(q*.185,.535,.655,.026,.03,.012,0xffffff,6,3);head.ell(q*.21,.72,.55,.11,.03,.045,0x3a2a1c,6,3);head.ell(q*.62,.48,0,.08,.14,.1,skin,8,4);head.ell(q*.36,.33,.5,.085,.05,.035,0xf2a08a,6,3)});
  head.ell(0,.4,.6,.065,.07,.065,colC.set(skin).multiplyScalar(.9).getHex(),8,4);head.ell(0,.23,.55,.13,.035,.045,0x9c3a32,8,4);
  if(o.g){const gc=o.g===2?0x101010:0x3a3a48;head.box(-.21,.39,.66,.3,.26,.03,gc);head.box(.21,.39,.66,.3,.26,.03,gc);head.box(0,.49,.66,.2,.05,.03,gc)}
- if(st===1&&ci%2===0){head.lathe(0,.66,0,[[.66,0],[.6,.24],[.34,.4],[0,.45]],(i,j)=>j%2?third:c,12);head.ell(0,.36,-.3,.67,.64,.44,c,12,6)}
+ if(st===1&&hat===8){head.lathe(0,.66,0,[[.66,0],[.6,.24],[.34,.4],[0,.45]],(i,j)=>j%2?third:c,12);head.ell(0,.36,-.3,.67,.64,.44,c,12,6)}
  else if(st===1){head.lathe(0,.6,0,[[.665,0],[.64,.24],[.38,.44],[0,.5]],hc,12);head.ell(0,.15,-.3,.63,.8,.37,hc,12,6);head.ell(0,.86,.36,.42,.15,.2,hc,8,4)}
  else if(hat===-1){head.lathe(0,.62,0,[[.66,0],[.62,.22],[.38,.4],[0,.46]],hc,12);head.ell(0,.52,-.3,.6,.42,.37,hc,10,5);head.ell(0,.88,.33,.42,.13,.2,hc,8,4)}
- else if(hat===0){head.lathe(0,.72,0,[[.54,0],[.52,.26],[0,.34]],(i,j)=>j%2?0x10204a:0xfafafa,10);if(st===2){head.ell(0,.08,.4,.36,.32,.24,0xf7f7f7,10,6);head.ell(0,.28,.58,.2,.05,.06,0xf7f7f7,8,3)}}
+ 
+ if(st===1&&hat<=0){}else if(hat===0){head.lathe(0,.72,0,[[.54,0],[.52,.26],[0,.34]],(i,j)=>j%2?0x10204a:0xfafafa,10);if(st===2){head.ell(0,.08,.4,.36,.32,.24,0xf7f7f7,10,6);head.ell(0,.28,.58,.2,.05,.06,0xf7f7f7,8,3)}}
  else if(hat===1){head.lathe(0,.7,0,[[.58,0],[.54,.28],[0,.4]],0xd8344f,10);head.soft(0,.72,.56,.72,.08,.5,0xb82a42,.03)}
  else if(hat===2){head.lathe(0,.72,0,[[1.05,0],[.56,.08],[.46,.46],[.2,.56]],0x7c4a26,12)}
  else if(hat===3){head.lathe(0,.74,0,[[.6,0],[.7,.14],[.4,.3],[0,.32]],0x202636,12)}
@@ -855,7 +926,7 @@ const CARCOLS=[0xfafafa,0xd8344f,0x2d67bb,0xf7b81f,0x2fa35a,0xef7a2a];
 // ---------- O'yin holati ----------
 const save=(()=>{try{return JSON.parse(localStorage.getItem('yolchi-v1'))||{}}catch(e){return{}}})();
 const G={jail:save.jl||null,name:save.n||'',color:clamp(save.c|0,0,11),stamps:new Set(save.st||[]),coins:new Set(save.co||[]),snd:save.snd!==0,done:new Set(save.dn||[]),act:save.ac||null,money:save.m!==undefined?save.m:2000+(save.co||[]).length*25+(save.b|0)*10,energy:save.e!==undefined?save.e:100,world:save.w||'uz',pos:save.pos||{},o:save.o||{h:-1,g:0,p:0},own:save.own||{},garage:save.gar||[],homes:save.hm||[],pet:save.pet||null,debts:save.db||[],jet:!!save.jet,hits:save.hits|0,taxi:null,boost:0,fam:save.fam&&typeof save.fam.id==='string'?{id:save.fam.id.slice(0,12),n:String(save.fam.n||'').slice(0,14)}:null};
-function persist(){if(me.char)G.pos[W.id]=[Math.round(me.x),Math.round(me.z)];try{localStorage.setItem('yolchi-v1',JSON.stringify({n:G.name,c:G.color,st:[...G.stamps],co:[...G.coins],snd:G.snd?1:0,dn:[...G.done],ac:G.act,m:G.money,e:Math.round(G.energy),w:W.id,pos:G.pos,o:G.o,own:G.own,gar:G.garage,hm:G.homes,pet:G.pet,db:G.debts,jet:G.jet,hits:G.hits,jl:G.jail,uid:myId,fam:G.fam}))}catch(e){}}
+function persist(){if(me.char)G.pos[W.id]=[Math.round(me.x),Math.round(me.z)];try{localStorage.setItem('yolchi-v1',JSON.stringify({n:G.name,c:G.color,st:[...G.stamps],co:[...G.coins],snd:G.snd?1:0,dn:[...G.done],ac:G.act,m:G.money,e:Math.round(G.energy),w:W.id,pos:G.pos,o:G.o,own:G.own,gar:G.garage,hm:G.homes,pet:G.pet,db:G.debts,jet:G.jet,hits:G.hits,jl:G.jail,uid:myId,fam:G.fam,gn:G.guns,am:G.ammo,ar:G.armor,hp:Math.round(G.hp),wl:G.wanted,q:G.q}))}catch(e){}}
 const me={x:0,y:10,z:0,vy:0,face:0,grounded:true,speed:0,car:null,region:-1,char:null,inside:null,ko:0,enter:null,popT:0,eatUntil:0,wasAir:false};
 const myId=(typeof save.uid==='string'&&save.uid.length>3&&save.uid.length<13&&save.uid)||Math.random().toString(36).slice(2,10);
 const cam={yaw:0,pitch:.34,dist:13,x:0,y:0,z:0,touched:0};
@@ -936,8 +1007,8 @@ const bind=(id,fn)=>$(id).addEventListener('pointerdown',e=>{e.stopPropagation()
 bind('jump',()=>jump());bind('carBtn',()=>carToggle());bind('talkBtn',()=>talkTo());bind('ctxBtn',()=>ctxAct());
 function jump(){if(me.car){beep(330,.28,'square',.08);beep(415,.28,'square',.06);bots.forEach(b=>{if(b.obj&&b.obj.visible&&Math.hypot(b.x-me.x,b.z-me.z)<16&&!b.fly)b.hop=performance.now()+420});return}if(me.grounded&&me.ko<=0){me.vy=13.5;me.grounded=false;beep(420,.09);burst(me.x,me.y+.2,me.z,0xd9cfae,6,3,.28,8)}}
 function carNear(){let b=null,bd=8.5;for(const c of cars){const d=Math.hypot(c.x-me.x,c.z-me.z);if(d<bd){bd=d;b=c}}return b}
-function carToggle(){if(G.jail||me.arrest)return;if(me.car){const c=me.car,tw=c.g.userData.two;me.x=c.x+Math.cos(c.h)*3.6;me.z=c.z-Math.sin(c.h)*3.6;me.y=groundAt(me.x,me.z)+.1;resolve(me,1);me.y=groundAt(me.x,me.z)+.1;c.speed=0;c.steer=0;me.car=null;me.char.visible=true;me.char.rotation.x=0;setSeat(false);beep(260,.08);me.popT=.3;if(G.taxi){showCard('Taksi','Yo‘lovchi','Mashinadan tushib ketdingiz, safar bekor bo‘ldi.');endTaxi(false)}return}
- const c=carNear();if(c){me.enter={c,t:0,x:me.x,z:me.z}}}
+function carToggle(){if(G.jail||me.arrest||me.out)return;if(me.ride){exitRide();return}if(me.car){const c=me.car,tw=c.g.userData.two;me.x=c.x+Math.cos(c.h)*3.6;me.z=c.z-Math.sin(c.h)*3.6;me.y=groundAt(me.x,me.z)+.1;resolve(me,1);me.y=groundAt(me.x,me.z)+.1;c.speed=0;c.steer=0;me.car=null;me.char.visible=true;me.char.rotation.x=0;setSeat(false);beep(260,.08);me.popT=.3;if(G.taxi){showCard('Taksi','Yo‘lovchi','Mashinadan tushib ketdingiz, safar bekor bo‘ldi.');endTaxi(false)}return}
+ const c=carNear(),pc=nearPeerCar();if(pc&&(!c||Math.hypot(pc.x-me.x,pc.z-me.z)<=Math.hypot(c.x-me.x,c.z-me.z)+2.5)){enterRide(pc);return}if(c){me.enter={c,t:0,x:me.x,z:me.z}}}
 function setSeat(on){const u=me.char.userData;if(on){u.leftL.rotation.x=-1.25;u.rightL.rotation.x=-1.25;u.la.rotation.x=-1.05;u.ra.rotation.x=-1.05}}
 
 // ---------- Ovoz ----------
@@ -966,7 +1037,7 @@ $('mini').addEventListener('click',openMap);
 $('mapC').addEventListener('click',e=>{const r=$('mapC').getBoundingClientRect(),sc=Math.min(r.width/MW,r.height/MH),ox=r.left+(r.width-MW*sc)/2,oy=r.top+(r.height-MH*sc)/2,mx=(e.clientX-ox)/sc,my=(e.clientY-oy)/sc,wx=minX+mx/MW*(maxX-minX),wz=minZ+my/MH*(maxZ-minZ),a=regionAt(wx,wz);mapSel=R[a.i];$('mapTxt').textContent=mapSel.n+' viloyati: '+mapSel.lm+(G.stamps.has(mapSel.id)?' (muhr bor)':'');$('mapGo').hidden=false;drawMap(mapSel)});
 $('mapGo').addEventListener('click',()=>{if(mapSel){$('mapP').hidden=true;teleport(mapSel)}});
 function teleport(r){tpTo(r.x-Math.sin(r.ldir)*14,r.z-Math.cos(r.ldir)*14,r.lx,r.lz)}
-function tpTo(tx,tz,lx,lz){if(G.jail){toast('Qamoqdan chiqib bo‘lmaydi');return}$('stamp').hidden=true;const f=$('fade');f.style.opacity=1;beep(700,.35,'sine',.08);setTimeout(()=>{if(me.car){me.char.visible=true;me.char.rotation.x=0;me.car.speed=0;me.car=null;if(G.taxi)endTaxi(false)}me.inside=null;me.floor=0;me.climb=null;me.x=tx;me.z=tz;me.y=groundAt(me.x,me.z)+.5;cam.yaw=Math.atan2(lx-me.x,lz-me.z);me.face=cam.yaw;cam.x=me.x;cam.z=me.z;cam.y=me.y+8;setTimeout(()=>f.style.opacity=0,120)},320)}
+function tpTo(tx,tz,lx,lz){if(G.jail){toast('Qamoqdan chiqib bo‘lmaydi');return}if(G.wanted>0){toast('Politsiya izlayapti: hozir teleport qilib bo‘lmaydi');return}if(me.ride)exitRide();$('stamp').hidden=true;const f=$('fade');f.style.opacity=1;beep(700,.35,'sine',.08);setTimeout(()=>{if(me.car){me.char.visible=true;me.char.rotation.x=0;me.car.speed=0;me.car=null;if(G.taxi)endTaxi(false)}me.inside=null;me.floor=0;me.climb=null;me.x=tx;me.z=tz;me.y=groundAt(me.x,me.z)+.5;cam.yaw=Math.atan2(lx-me.x,lz-me.z);me.face=cam.yaw;cam.x=me.x;cam.z=me.z;cam.y=me.y+8;setTimeout(()=>f.style.opacity=0,120)},320)}
 bind('bPass',()=>{const g=$('pGrid');g.textContent='';$('pHead').textContent=W.name+'. Barcha muhrlar: '+G.stamps.size+'/'+allRegions+'. Topshiriqlar: '+G.done.size+'/'+MISS.length+'.';R.forEach(r=>{const d=document.createElement('div');d.className='ps';const s=document.createElement('div');s.className='seal'+(G.stamps.has(r.id)?'':' off');s.textContent=G.stamps.has(r.id)?r.n:'?';const t=document.createElement('div');t.textContent=r.lm;d.append(s,t);g.append(d)});openPanel('passP')});
 const SAYS=['Salom!','Bu yoqqa keling!','Zo‘r!','Poyga qilamizmi?','Rahmat!','Xayr!'];
 SAYS.forEach((t,i)=>{const b=document.createElement('button');b.className='sticker';b.textContent=t;b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();doSay(i);$('say').hidden=true});$('say').append(b)});
@@ -1004,6 +1075,7 @@ function updateBots(dt,now){let near=null,nd=8,tb=null,td=13;for(const b of bots
   if(d2>BOTD*BOTD){if(b.obj)b.obj.visible=false;continue}
   if(!b.obj){b.obj=makeChar(b.ci,b.st,true);worldRoot.add(b.obj)}b.obj.visible=true;const d=Math.sqrt(d2);const u=b.obj.userData;
   if(b.fly){flyBot(b,dt,now);continue}
+  if(b.down){b.obj.position.set(b.x,groundAt(b.x,b.z)+.3,b.z);b.obj.rotation.set(-Math.PI/2,b.face,0);if(now-b.down>14000){b.down=0;b.hp=100;b.obj.rotation.set(0,b.face,0);b.flee=now+5000;say(b,'Politsiya chaqiraman!',2500,now)}continue}
   if(d<nd&&!me.car&&(me.inside===(b.house||null))){nd=d;near=b}
   if(me.car&&b.kind==='walk'&&d<td&&Math.abs(me.car.speed)<9&&!G.taxi&&!b.credit){td=d;tb=b}
   const m=wantMark(b);if(m!==b.mark){if(b.mk){b.obj.remove(b.mk);b.mk.material.map.dispose();b.mk.material.dispose();b.mk=null}b.mark=m;if(m){b.mk=labelSprite(m,m==='Qarz'?'#d8344f':'#f7b81f',m==='Qarz'?'#ffffff':'#10204a');b.mk.position.y=3.05;b.obj.add(b.mk)}}
@@ -1012,12 +1084,13 @@ function updateBots(dt,now){let near=null,nd=8,tb=null,td=13;for(const b of bots
   if(b.bub&&now>b.bub){b.bub=0;setBubbleText(b.obj,'')}
   b.spd=0;
   const chase=b.credit&&(b.credit.el||0)>60&&d<95&&d>3&&!b.house;
-  if(chase){const ax=-dx,az=-dz;b.x+=ax/d*8.5*dt;b.z+=az/d*8.5*dt;resolve(b,.75);b.spd=8.5;b.face=Math.atan2(ax,az);if(now>b.greet){b.greet=now+7000;say(b,'Qarzingizni bering!',2500,now);b.wave=now+1400}}
+  if(b.flee&&now<b.flee&&!b.store&&!b.house&&d<90){const l=Math.max(d,.1);b.x+=dx/l*9*dt;b.z+=dz/l*9*dt;resolve(b,.75);b.spd=9;b.face=Math.atan2(dx,dz)}
+  else if(chase){const ax=-dx,az=-dz;b.x+=ax/d*8.5*dt;b.z+=az/d*8.5*dt;resolve(b,.75);b.spd=8.5;b.face=Math.atan2(ax,az);if(now>b.greet){b.greet=now+7000;say(b,'Qarzingizni bering!',2500,now);b.wave=now+1400}}
   else if(now<b.busy||b.kind==='giver'||b.kind==='clerk'||b.credit&&d<=3){if(d<9)b.face=Math.atan2(-dx,-dz)}
   else if(b.wait>0){b.wait-=dt}
   else{const ax=b.tx-b.x,az=b.tz-b.z,l=Math.hypot(ax,az);if(l<1.4){b.wait=1+botR()*5;pickBotTarget(b)}else{const ox=b.x,oz=b.z;b.x+=ax/l*b.sp*dt;b.z+=az/l*b.sp*dt;resolve(b,.75);b.spd=b.sp;let q=Math.atan2(ax,az)-b.face;q=Math.atan2(Math.sin(q),Math.cos(q));b.face+=q*Math.min(1,dt*8);if(Math.hypot(b.x-ox,b.z-oz)<b.sp*dt*.4&&++b.stuck>10){b.stuck=0;pickBotTarget(b)}}}
   b.y=groundAt(b.x,b.z);let hopY=0;if(b.hop){const t=(b.hop-now)/420;if(t<=0)b.hop=0;else hopY=Math.sin(t*Math.PI)*1.5}b.obj.position.set(b.x,b.y+hopY,b.z);b.obj.rotation.set(0,b.face,0);animChar(b.obj,b.spd,dt,hopY>0);
-  if(now<(b.wave||0)){u.ra.rotation.x=-2.7+Math.sin(now*.014)*.4}
+  if(now<(b.wave||0)){u.ra.rotation.x=-2.7+Math.sin(now*.014)*.4}if(now<(b.hands||0)){u.ra.rotation.x=u.la.rotation.x=-2.9}
   if(now<(b.happy||0)&&Math.random()<dt*6)spawnP(b.x,b.y+3.4,b.z,(Math.random()-.5)*2,3,(Math.random()-.5)*2,.34,0xff4d8d,.8,2)}
  botChats(dt,now);nearBot=near;taxiBot=tb}
 function hitBot(b,now){const c=me.car,sp=Math.abs(c.speed),sg=Math.sign(c.speed)||1;b.hitT=now+22000;b.fly={vx:Math.sin(c.h)*sp*.62*sg+(Math.random()-.5)*5,vy:7+sp*.25,vz:Math.cos(c.h)*sp*.62*sg+(Math.random()-.5)*5,spin:(6+sp*.16)*(Math.random()<.5?1:-1),st:0,t:0,rx:0,rz:0};b.hitSp=sp;c.speed*=.28;shake=.7;slow=.9;beep(95,.25,'square',.14);setTimeout(()=>beep(620,.18,'triangle',.08),90);say(b,'Voy-dod!',2000,now);burst(b.x,b.y+1.6,b.z,[0xffffff,0xf7b81f,0xd8344f],16,8,.3);G.hits++;setTimeout(()=>openHit(b),1250)}
@@ -1028,13 +1101,13 @@ function flyBot(b,dt,now){const f=b.fly,o=b.obj,u=o.userData;f.t+=dt;
  else{const t=clamp(f.t/.7,0,1);f.rx=-Math.PI/2*(1-t);b.y=groundAt(b.x,b.z)+.3*(1-t);if(t>=1){b.fly=null;o.rotation.set(0,b.face,0);if(!b.house)b.home={x:b.x,z:b.z,r:30};pickBotTarget(b);b.wave=now+2000;return}}
  o.position.set(b.x,b.y,b.z);o.rotation.set(f.rx,b.face,f.rz)}
 // Urib ketish oynasi
-let hitBotRef=null;function hitPrice(){const a=+$('hitR').value;$('hitAmt').textContent=a+' tanga';const m=Math.floor(G.money);$('hitW').textContent=m>=a?'Hamyoningizda '+m+' tanga bor.':'Hamyoningizda '+m+' tanga bor. Yetmagan '+(a-m)+' tanga '+(hitBotRef?hitBotRef.name:'')+'dan qarz bo‘lib qoladi.'}
-let haggled=false;function openHit(b){hitBotRef=b;haggled=false;if(me.car)me.car.speed=0;const dem=clamp(Math.round((500+clamp((b.hitSp||20)/90,0,1)*550+Math.random()*450)/50)*50,500,1500);$('hitT').textContent='Voy! Odam urib ketdingiz';$('hitD').textContent=b.name+' sizdan tovon so‘rayapti. U o‘zi narxni aytdi:';$('hitR').value=dem;$('hitBar').hidden=false;$('hitHag').hidden=false;hitPrice();$('hitP').hidden=false;say(b,dem+' tanga bering!',3600);beep(200,.3,'sawtooth',.05)}
+let hitBotRef=null;function hitPrice(){const a=+$('hitR').value;$('hitAmt').textContent=a+' tanga';const m=Math.floor(G.money);$('hitW').textContent=m>=a?'Hamyoningizda '+m+' tanga bor.':'Hamyoningizda '+m+' tanga bor. Yetmagan '+(a-m)+' tanga '+(hitBotRef?hitBotRef.name:'')+'dan qarz bo‘ladi: 2 daqiqada to‘lanmasa, qamalasiz.'}
+let haggled=false;function openHit(b){hitBotRef=b;haggled=false;if(me.car)me.car.speed=0;const dem=clamp(Math.round((Math.random()*Math.random()*7000+clamp((b.hitSp||20)/90,0,1)*3000)/10)*10,1,10000)||1;$('hitT').textContent='Voy! Odam urib ketdingiz';$('hitD').textContent=b.name+' sizdan tovon so‘rayapti. U o‘zi narxni aytdi:';$('hitR').value=dem;$('hitBar').hidden=false;$('hitHag').hidden=false;hitPrice();$('hitP').hidden=false;say(b,dem+' tanga bering!',3600);beep(200,.3,'sawtooth',.05)}
 $('hitR').addEventListener('input',hitPrice);
-$('hitR').hidden=true;{const row=document.createElement('div');row.id='hitBar';row.style.cssText='display:flex;gap:8px;justify-content:center';const h=document.createElement('button');h.id='hitHag';h.className='go';h.style.background='#fffdf6';h.textContent='Savdolashish';h.addEventListener('click',()=>{if(haggled)return;haggled=true;h.hidden=true;const b=hitBotRef,cur=+$('hitR').value;if(Math.random()<.55){const nv=Math.max(500,cur-(Math.floor(Math.random()*4)+1)*50);$('hitR').value=nv;$('hitD').textContent=b.name+': “Mayli, '+nv+' tanga bo‘lsin.”';say(b,'Mayli, '+nv+' bo‘lsin.',3000)}else{const nv=Math.min(1500,cur+100);$('hitR').value=nv;$('hitD').textContent=b.name+': “Yo‘q! Urib ketib savdolashasizmi? Endi '+nv+' tanga!”';say(b,'Endi '+nv+' tanga!',3000);b.wave=performance.now()+2500}hitPrice()});row.append(h);$('hitW').before(row)}
+$('hitR').hidden=true;$('hitR').min=1;$('hitR').max=10000;$('hitR').step=1;{const row=document.createElement('div');row.id='hitBar';row.style.cssText='display:flex;gap:8px;justify-content:center';const h=document.createElement('button');h.id='hitHag';h.className='go';h.style.background='#fffdf6';h.textContent='Savdolashish';h.addEventListener('click',()=>{if(haggled)return;haggled=true;h.hidden=true;const b=hitBotRef,cur=+$('hitR').value;if(Math.random()<.55){const nv=Math.max(1,cur-Math.max(1,Math.round(cur*(.1+Math.random()*.2)/10)*10));$('hitR').value=nv;$('hitD').textContent=b.name+': “Mayli, '+nv+' tanga bo‘lsin.”';say(b,'Mayli, '+nv+' bo‘lsin.',3000)}else{const nv=Math.min(10000,Math.round(cur*1.2/10)*10+50);$('hitR').value=nv;$('hitD').textContent=b.name+': “Yo‘q! Urib ketib savdolashasizmi? Endi '+nv+' tanga!”';say(b,'Endi '+nv+' tanga!',3000);b.wave=performance.now()+2500}hitPrice()});row.append(h);$('hitW').before(row)}
 $('hitPay').addEventListener('click',()=>{const b=hitBotRef;if(!b)return;const a=+$('hitR').value,pay=Math.min(Math.floor(G.money),a),rest=a-pay;G.money-=pay;$('hitP').hidden=true;bumpMoney();
  if(b.obj)for(let i=0;i<Math.min(24,Math.ceil(pay/60));i++)setTimeout(()=>{if(b.obj)spawnP(me.x,me.y+2.5,me.z,(b.x-me.x)*1.4,6,(b.z-me.z)*1.4,.32,0xffc41f,.72,10)},i*35);beep(1200,.08);
- if(rest>0){G.debts.push({id:Date.now(),w:W.id,bi:b.idx,name:b.name,amt:rest,orig:rest,el:0,ik:0});refreshDebts();say(b,'Qarzingiz: '+rest+' tanga!',4200);showCard('Qarz',b.name,'Sizda '+rest+' tanga qarz qoldi. 25 daqiqa o‘yin vaqtida to‘lamasangiz, politsiya sizni qamaydi! Har 3 daqiqada 5% ko‘payadi, topgan pulingizning 20% i ushlanadi. Yoniga borib to‘lang yoki telefon orqali o‘tkazing.',9000)}
+ if(rest>0){G.debts.push({id:Date.now(),w:W.id,bi:b.idx,name:b.name,amt:rest,orig:rest,el:1380,ik:0});refreshDebts();say(b,'Qarzingiz: '+rest+' tanga!',4200);showCard('Qarz',b.name,'Sizda '+rest+' tanga qarz qoldi. 2 daqiqa ichida to‘lamasangiz, politsiya sizni qamaydi! Har 3 daqiqada 5% ko‘payadi, topgan pulingizning 20% i ushlanadi. Yoniga borib to‘lang yoki telefon orqali o‘tkazing.',9000)}
  else{say(b,'Mayli, kechirdim. Ehtiyot bo‘ling!',3200);b.happy=performance.now()+2500;showCard('To‘landi',b.name,a+' tanga oldi. Boshqa ehtiyot bo‘lib haydang!')}
  setCounts();persist()});
 function payCreditor(b){const d=b.credit;if(!d)return;const a=Math.ceil(d.amt);if(G.money<1){showCard('Qarz',b.name,'Qarzingiz '+a+' tanga. Hozir pulingiz yo‘q. Tanga yig‘ing, taksi yoki topshiriq bilan ishlang.');return}const pay=Math.min(a,Math.floor(G.money));G.money-=pay;d.amt-=pay;burst(b.x,b.y+2.5,b.z,0xffc41f,10,4,.3);beep(1200,.08);if(d.amt<1){G.debts.splice(G.debts.indexOf(d),1);say(b,'Rahmat, endi tinchman!',3000);b.happy=performance.now()+2600;showCard('To‘landi',b.name,'Qarzingiz butunlay uzildi.')}else{say(b,'Qolganini ham bering!',3000);showCard('Qisman',b.name,pay+' tanga berdingiz. Yana '+Math.ceil(d.amt)+' tanga qoldi.')}refreshDebts();persist()}
@@ -1049,7 +1122,7 @@ function updateTraffic(dt){const now=performance.now(),ph=Math.floor(now/9000)%2
   if(!me.car&&t.g&&t.g.visible){const dx0=me.x-t.x,dz0=me.z-t.z,fx0=Math.sin(t.g.rotation.y),fz0=Math.cos(t.g.rotation.y),ah=dx0*fx0+dz0*fz0;if(ah>0&&ah<11&&Math.abs(dx0*fz0-dz0*fx0)<2.6)sp=0}
   t.cv=lerp(t.cv===undefined?sp:t.cv,sp,Math.min(1,dt*(sp<t.cv?4:1.5)));t.i+=t.dir*t.cv*dt/(a[0].city?8:9);const L=t.a.length-1;if(t.i>=L-1){t.i=L-1.01;t.dir=-1}if(t.i<=0){t.i=.01;t.dir=1}const n=Math.floor(t.i),u=t.i-n,p=t.a[n],q=t.a[n+1],fx=(p.tx+(q.tx-p.tx)*u)*t.dir,fz=(p.tz+(q.tz-p.tz)*u)*t.dir,x=lerp(p.x,q.x,u)-fz*t.l,z=lerp(p.z,q.z,u)+fx*t.l,dx=x-me.x,dz=z-me.z,d2=dx*dx+dz*dz;t.x=x;t.z=z;
   if(d2>160000){if(t.g)t.g.visible=false;continue}if(!t.g){t.g=makeCar(t.col,t.model);worldRoot.add(t.g)}t.g.visible=true;if(t.g.userData.lights){const on=Math.floor(performance.now()/260)%2;t.g.userData.lights[0].visible=!!on;t.g.userData.lights[1].visible=!on}t.g.position.set(x,lerp(p.h,q.h,u)+(p.lift===undefined?.46:p.lift)+(p.yo||0),z);t.g.rotation.y=Math.atan2(fx,fz);t.g.userData.wh.forEach(w=>w.children[0].rotation.x+=t.cv*dt*1.5);
-  if(d2<14){if(me.car){me.car.speed*=.8;if(Math.abs(me.car.speed)>6){shake=.3;beep(100,.1,'square',.07)}}else if(me.ko<=0){me.ko=2.4;me.vy=11;const l=Math.sqrt(d2)||1;me.kx=-dx/l*9;me.kz=-dz/l*9;shake=.6;slow=.6;beep(95,.25,'square',.14);burst(me.x,me.y+1.5,me.z,[0xffffff,0xf7b81f],14,7,.3);setTimeout(()=>{addMoney(200);showCard('+200','Haydovchi','Kechirasiz! Mana, 200 tanga tovon oling.')},1100)}}}}
+  if(d2<14){if(me.car){me.car.speed*=.8;if(Math.abs(me.car.speed)>6){shake=.3;beep(100,.1,'square',.07)}}else if(me.ko<=0&&!me.ride&&!me.out){me.ko=2.4;me.vy=11;const l=Math.sqrt(d2)||1;me.kx=-dx/l*9;me.kz=-dz/l*9;shake=.6;slow=.6;beep(95,.25,'square',.14);burst(me.x,me.y+1.5,me.z,[0xffffff,0xf7b81f],14,7,.3);setTimeout(()=>{addMoney(200);showCard('+200','Haydovchi','Kechirasiz! Mana, 200 tanga tovon oling.')},1100)}}}}
 // Taksi
 function startTaxi(b){const opts=R.filter(r=>Math.hypot(r.x-me.x,r.z-me.z)>180).map(r=>({x:r.x,z:r.z,n:r.city})).concat(VILLAGES.filter(v=>v.town&&Math.hypot(v.x-me.x,v.z-me.z)>180).map(v=>({x:v.x,z:v.z,n:v.n})));if(!opts.length)return;const d=opts[Math.floor(botR()*opts.length)],dist=Math.hypot(d.x-me.x,d.z-me.z);G.taxi={x:d.x,z:d.z,n:d.n,pay:Math.round(dist*.5)+80,b};b.inTaxi=true;if(b.obj)b.obj.visible=false;beep(800,.1);showCard('Taksi',b.name,d.n+'ga olib boring. Haqi: '+G.taxi.pay+' tanga. Mashinadan tushsangiz, safar bekor bo‘ladi.',6000)}
 function endTaxi(ok){const t=G.taxi;if(!t)return;G.taxi=null;const b=t.b;b.inTaxi=false;b.x=me.x+4;b.z=me.z+2;b.y=groundAt(b.x,b.z);b.home={x:b.x,z:b.z,r:28};b.house=null;pickBotTarget(b);if(ok){addMoney(t.pay);if(JOB&&JOB.id==='taxi'){JOB.earned+=t.pay;JOB.n++}fanfare();showCard('+'+t.pay,b.name,'Rahmat, yetib keldik! Mana, haqingiz.');if(b.obj)say(b,'Rahmat!',2400)}}
@@ -1067,7 +1140,8 @@ const SHOP=[
  {k:'Uy-joy',items:[it('flat','Kvartira',40000,'Eng yaqin uyni sotib olasiz',{home:1}),it('yard','Hovli uy',90000,'Yonida bog‘ devori bilan',{home:2}),it('villa','Villa',250000,'Yonida basseyn bilan',{home:3}),it('palace','Saroy',1000000,'Tomida oltin gumbaz bilan',{home:4}),it('sofa','Divan',2500,'Uyingizga qo‘yiladi',{fur:1}),it('bed','Karavot',3000,'',{fur:1}),it('fridge','Muzlatgich',4000,'',{fur:1}),it('tv','Televizor',5000,'Ekrani ishlaydi',{fur:1}),it('pc','Kompyuter',9000,'',{fur:1}),it('aqua','Akvarium',2500,'Baliqlari suzadi',{fur:1}),it('piano','Pianino',15000,'',{fur:1})]},
  {k:'Hayvon',items:[it('cat','Mushuk',1000,'Orqangizdan yuradi',{pet:'cat'}),it('dog','It',1500,'Sodiq do‘st',{pet:'dog'}),it('sheep','Qo‘zichoq',1200,'Yumshoq',{pet:'sheep'}),it('horse','Ot',30000,'Chiroyli yuradi',{pet:'horse'}),it('nopet','Hayvonni uyga qoldirish',0,'',{pet:null})]},
  {k:'Xizmat',items:[it('barber','Sartarosh',150,'Yangilanish hissi',{e:5,msg:'Soch olindi, ko‘rinishingiz zo‘r!'}),it('gym','Sport zal',300,'60 soniya tezroq',{e:-10,b:60,msg:'Mashq qildingiz, endi tezroqsiz.'}),it('doctor','Shifokor',500,'Quvvat to‘ladi',{e:100,msg:'Shifokor sizni tekshirdi, sog‘lomsiz.'}),it('massage','Massaj',400,'Dam olish',{e:45,msg:'Yengil tortdingiz.'}),it('cinema','Kinoteatr',100,'Kino ko‘rasiz',{e:10,cin:1}),it('lotto','Lotereya chiptasi',200,'0 dan 5000 tangagacha yutuq',{lot:1})]},
- {k:'Sovg‘a',items:[it('gul','Guldasta',100,'',{item:1}),it('book','Kitob',150,'',{item:1}),it('ball','Futbol to‘pi',300,'',{item:1}),it('perf','Atir',2500,'',{item:1}),it('wch2','Qo‘l soati',6000,'',{item:1}),it('ring','Tilla uzuk',12000,'',{item:1}),it('dia','Olmos uzuk',80000,'',{item:1})]}
+ {k:'Sovg‘a',items:[it('gul','Guldasta',100,'',{item:1}),it('book','Kitob',150,'',{item:1}),it('ball','Futbol to‘pi',300,'',{item:1}),it('perf','Atir',2500,'',{item:1}),it('wch2','Qo‘l soati',6000,'',{item:1}),it('ring','Tilla uzuk',12000,'',{item:1}),it('dia','Olmos uzuk',80000,'',{item:1})]},
+ {k:'Qurol',items:[it('pistol','Pistolet',5000,'12 o‘q bilan. Tez otadi',{gun:1,ammo:12}),it('rifle','Avtomat',15000,'30 o‘q bilan. Ketma-ket otadi',{gun:2,ammo:30}),it('ammo1','O‘q (30 dona)',300,'Pistolet va avtomat uchun',{ammo:30}),it('ammo2','O‘q (120 dona)',1000,'Katta quti',{ammo:120}),it('armor','Bronejilet',4000,'Jarohatni yarmiga kamaytiradi',{armor:1}),it('aid','Dori qutisi',250,'Jonni 100% qiladi',{heal:1})]}
 ];
 let shopTab=0,shopType=null,cart=[];
 const catsAll=()=>SHOP.concat([{k:'Esdalik',items:W.souv.map((a,i)=>it('sv_'+W.id+i,a[0],a[1],W.name+' esdaligi',{item:1}))}]);
@@ -1078,7 +1152,7 @@ function renderShop(){const tabs=$('sTabs');tabs.textContent='';const all=catsAl
 $('sPay').addEventListener('click',()=>{const tot=cart.reduce((a,q)=>a+q.p,0);if(!cart.length||!spend(tot))return;let e=0,b0=0;cart.forEach(q=>{e+=q.fx.e||0;b0=Math.max(b0,q.fx.b||0)});cart=[];$('shopP').hidden=true;eat(e,b0);speak('Xaridingiz uchun rahmat!');toast('Kassada to‘landi: '+tot+' tanga');persist()});
 $('sClear').addEventListener('click',()=>{cart=[];renderShop()});
 const wearOwned=q=>{const f=q.fx;return G.own[q.id]&&(f.hat!==undefined||f.gl!==undefined||f.pk!==undefined||f.ci!==undefined||f.pet!==undefined)};
-const isOwned=q=>{const f=q.fx;if(f.car)return false;return !!G.own[q.id]&&!(f.e!==undefined||f.lot||f.cin||f.msg||f.home)};
+const isOwned=q=>{const f=q.fx;if(f.car)return false;return !!G.own[q.id]&&!(f.e!==undefined||f.lot||f.cin||f.msg||f.home||f.heal||(f.ammo&&!f.gun))};
 function eat(e,b){me.eatUntil=performance.now()+1500;if(e)G.energy=clamp(G.energy+e,0,100);if(b)G.boost=performance.now()+b*1000;for(let i=0;i<8;i++)setTimeout(()=>{if(me.char)spawnP(me.x,me.y+3.4,me.z,(Math.random()-.5)*3,3,(Math.random()-.5)*3,.3,0xff4d8d,.8,2)},i*120);beep(520,.1);setTimeout(()=>beep(660,.1),130)}
 function buy(q){const f=q.fx,big=f.car||f.home||f.jet;if(wearOwned(q)){applyFx(q);renderShop();return}if(big&&G.debts.length){toast('Avval qarzingizni to‘lang: '+debtTotal()+' tanga');beep(120,.2,'square',.06);return}const price=q.p;if(f.home&&!freeHouse()){toast('Yaqin atrofda uy yo‘q. Shahar yoki qishloqqa boring.');return}if(price&&!spend(price))return;burst(me.x,me.y+3,me.z,[0xffc41f,0xd8344f,0x12a5b5,0xffffff],20,6,.28);if(!(f.e!==undefined&&f.msg===undefined)&&!f.lot&&!f.cin&&!f.car)G.own[q.id]=1;if(f.car)G.own[q.id]=1;applyFx(q);renderShop();persist()}
 function freeHouse(){let b=null,bd=340;houses.forEach((h,i)=>{if(G.homes.some(q=>q.w===W.id&&q.hi===i))return;const d=Math.hypot(h.x-me.x,h.z-me.z);if(d<bd){bd=d;b=i}});return b===null?null:{i:b}}
@@ -1087,19 +1161,20 @@ function applyFx(q){const f=q.fx;if(f.ph)G.own.phone=1;if(f.e!==undefined&&!f.ms
  if(f.car){G.garage.push({m:f.car,c:f.col});const c=spawnOwn(G.garage.length-1);$('shopP').hidden=true;toast(CARS[f.car].n+' keldi! Yoningizda turibdi.')}
  if(f.jet){G.jet=true;toast('Endi bepul uchasiz! “Dunyo” tugmasini bosing.')}
  if(f.home){const q0=freeHouse();if(q0){G.homes.push({w:W.id,hi:q0.i,t:f.home,n:q.n});decorHomes();const h=houses[q0.i];$('shopP').hidden=true;tpTo(h.door.x+h.door.fx*7,h.door.z+h.door.fz*7,h.x,h.z);setTimeout(()=>{fanfare();banner('Tabriklaymiz!',q.n+' endi sizniki')},500)}}
+ if(f.gun){G.guns[f.gun]=1;G.wsel=f.gun;updWpn();toast(q.n+' sizniki. Qizil tugma bilan otasiz. Ehtiyot bo‘ling: odamga otsangiz, politsiya quvadi!')}if(f.ammo){G.ammo+=f.ammo;updWpn()}if(f.armor){G.armor=1;toast('Bronejilet kiyildi')}if(f.heal){G.hp=100;toast('Jon 100%')}
  if(f.fur)decorHomes();if(f.pet!==undefined){G.pet=f.pet;makePet()}
  if(f.cin){const fd=$('fade');fd.style.background='#000';fd.style.opacity=1;$('shopP').hidden=true;beep(330,.5,'sine',.04);setTimeout(()=>{fd.style.opacity=0;setTimeout(()=>fd.style.background='#fff',400);G.energy=clamp(G.energy+10,0,100);toast('Kino zo‘r bo‘ldi!')},2600)}
  if(f.lot){const w=Math.random(),win=w<.5?0:w<.8?150:w<.95?600:w<.995?2000:5000;$('shopP').hidden=true;setTimeout(()=>{if(win){addMoney(win);fanfare();showCard('+'+win,'Lotereya','Yutdingiz: '+win+' tanga!')}else showCard('0','Lotereya','Bu safar yutuq chiqmadi.')},500)}
  setCounts()}
 function siren(n){for(let i=0;i<(n||2)*4;i++)setTimeout(()=>beep(i%2?660:880,.22,'square',.04),i*230)}
-function startArrest(){if(JOB)endJob(false);const q=me.car;if(q){q.speed=0}$('hitP').hidden=true;['shopP','walP','worldP','mapP','passP','jobP'].forEach(i=>$(i).hidden=true);const f=[Math.sin(me.face),Math.cos(me.face)],sx=me.x-f[0]*55,sz=me.z-f[1]*55,g=makeCar(0xf3f5f7,'police');worldRoot.add(g);me.arrest={t:0,g,sx,sz};banner('Politsiya!','Qarzni 25 daqiqada to‘lamadingiz');siren(3);toast('Siz hibsga olinyapsiz')}
+function startArrest(kind){me.arrestKind=kind||'debt';if(JOB)endJob(false);clearCops();if(me.ride)exitRide();me.rob=null;atkHeld=false;const q=me.car;if(q){q.speed=0}$('hitP').hidden=true;['shopP','walP','worldP','mapP','passP','jobP'].forEach(i=>$(i).hidden=true);const f=[Math.sin(me.face),Math.cos(me.face)],sx=me.x-f[0]*55,sz=me.z-f[1]*55,g=makeCar(0xf3f5f7,'police');worldRoot.add(g);me.arrest={t:0,g,sx,sz};banner('Politsiya!',kind==='crime'?'Siz qonunni buzdingiz':'Qarzni o‘z vaqtida to‘lamadingiz');siren(3);toast('Siz hibsga olinyapsiz')}
 function updateArrest(dt,now){const A=me.arrest;A.t+=dt;const c=me.car;if(c)c.speed=0;const T0=Math.min(A.t/3,1),e=1-(1-T0)*(1-T0),tx=me.x+Math.cos(me.face)*5,tz=me.z-Math.sin(me.face)*5,x=lerp(A.sx,tx,e),z=lerp(A.sz,tz,e);A.g.position.set(x,groundAt(x,z),z);A.g.rotation.y=Math.atan2(tx-A.sx,tz-A.sz);const L=A.g.userData.lights,on=Math.floor(now/170)%2;L[0].visible=!!on;L[1].visible=!on;spawnP(x,groundAt(x,z)+2.2,z,0,1,0,.22,on?0xff3030:0x3060ff,.25,0);
  if(me.char&&!c){const u=me.char.userData;u.la.rotation.x=.6;u.ra.rotation.x=.6;u.la.rotation.z=.25;u.ra.rotation.z=-.25}
- if(A.t>4.2&&!A.done){A.done=true;const fd=$('fade');fd.style.background='#000';fd.style.opacity=1;setTimeout(()=>{worldRoot.remove(A.g);me.arrest=null;if(me.car){me.car.speed=0;me.car=null;me.char.visible=true}me.inside=null;const u=me.char.userData;u.la.rotation.z=0;u.ra.rotation.z=0;G.jail={left:300};G.debts.forEach(d=>{d.el=0});const q=jailSpot||{x:me.x,z:me.z};me.x=q.x;me.z=q.z+(jailSpot?6:0);me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z-14;cam.y=me.y+8;cam.yaw=0;me.face=0;setTimeout(()=>{fd.style.opacity=0;setTimeout(()=>fd.style.background='#fff',400);banner('Qamoqxona','5 daqiqa muddat. Garov bilan erta chiqish mumkin');showCard('Qamoq','Hakam','Qarzni to‘lamaganingiz uchun 5 daqiqaga qamaldingiz. Chiqqach, qarzni to‘lash uchun yana 25 daqiqa beriladi.',9000)},700);persist()},700)}}
-function bailCost(){return debtTotal()+1000}
+ if(A.t>4.2&&!A.done){A.done=true;const fd=$('fade');fd.style.background='#000';fd.style.opacity=1;setTimeout(()=>{worldRoot.remove(A.g);me.arrest=null;if(me.car){me.car.speed=0;me.car=null;me.char.visible=true}me.inside=null;const u=me.char.userData;u.la.rotation.z=0;u.ra.rotation.z=0;G.jail={left:1740,crime:me.arrestKind==='crime',dig:0};if(G.jail.crime){G.wanted=0;updWant();if(G.guns[1]||G.guns[2]){G.guns={};G.wsel=0;G.ammo=0;delete G.own.pistol;delete G.own.rifle;updWpn()}}G.debts.forEach(d=>{d.el=0});const q=jailSpot||{x:me.x,z:me.z};me.x=q.x;me.z=q.z+(jailSpot?6:0);me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z-14;cam.y=me.y+8;cam.yaw=0;me.face=0;setTimeout(()=>{fd.style.opacity=0;setTimeout(()=>fd.style.background='#fff',400);banner('Qamoqxona','29 daqiqa. Garov to‘lang yoki tunnel qazing');showCard('Qamoq','Hakam',(G.jail&&G.jail.crime?'Jinoyat uchun':'Qarzni to‘lamaganingiz uchun')+' 29 daqiqaga qamaldingiz. “Kovlash” tugmasini ko‘p bosib tunnel qazing yoki “Garov” to‘lab chiqing.'+(G.jail&&G.jail.crime?' Qurollaringiz olib qo‘yildi.':''),10000)},700);persist()},700)}}
+function bailCost(){return debtTotal()+(G.jail&&G.jail.crime?10000:3000)}
 function releaseJail(paid){G.jail=null;const q=jailSpot;if(q){me.x=q.x;me.z=q.zmax+32;me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z-14}fanfare();banner('Ozodlik!',paid?'Garov to‘landi, qarz uzildi':'Muddat tugadi. Qarzni 25 daqiqada to‘lang');persist()}
 function payBail(){const c0=bailCost();if(!spend(c0))return;G.debts.length=0;refreshDebts();releaseJail(true)}
-function refreshChar(){if(!me.char)return;const vis=me.char.visible;scene.remove(me.char);me.char=makeChar(G.color,G.o.fem?1:0,false,G.o);scene.add(me.char);const lab=labelSprite(G.name+(G.fam?' ♥':''),'#'+COLS[G.color].toString(16).padStart(6,'0'),G.color===7?'#10204a':'#ffffff');lab.position.y=3.75;me.char.add(lab);me.lab=lab;me.char.visible=vis;me.char.position.set(me.x,me.y,me.z);me.char.rotation.y=me.face;if(JOB&&JOB.carry)setCarry(true);burst(me.x,me.y+2,me.z,[0xffffff,0xf7b81f],14,5,.25);sendPresence(true)}
+function refreshChar(){if(!me.char)return;const vis=me.char.visible;scene.remove(me.char);me.char=makeChar(G.color,G.o.fem?1:0,false,G.o);scene.add(me.char);const lab=labelSprite(G.name+(G.fam?' ♥':''),'#'+COLS[G.color].toString(16).padStart(6,'0'),G.color===7?'#10204a':'#ffffff');lab.position.y=3.75;me.char.add(lab);me.lab=lab;me.char.visible=vis;me.char.position.set(me.x,me.y,me.z);me.char.rotation.y=me.face;if(JOB&&JOB.carry)setCarry(true);setGun(me.char,G.wsel);if(me.ride)me.char.visible=false;burst(me.x,me.y+2,me.z,[0xffffff,0xf7b81f],14,5,.25);sendPresence(true)}
 function spawnOwn(i){const g=G.garage[i];let e=cars.find(c=>c.own===i);const f=Math.sin(me.face),d=Math.cos(me.face);let x=me.x+Math.cos(me.face)*6+f*2,z=me.z-Math.sin(me.face)*6+d*2;for(let k=0;k<8&&(collides(x,z,3,3)||houseAt(x,z));k++){const a=k*.9;x=me.x+Math.cos(a)*(7+k);z=me.z+Math.sin(a)*(7+k)}if(me.car===e&&e)return e;if(!e)e=addCar(x,z,me.face,g.c,g.m,i);e.x=x;e.z=z;e.h=me.face;e.speed=0;e.drop=26;anims.push((t,dt)=>{if(!e.g)return true;e.drop=Math.max(0,e.drop-dt*34);syncCar(e,0);if(e.drop<=0){burst(e.x,e.y+.4,e.z,0xd9cfae,14,6,.4,8);shake=.2;beep(150,.2,'square',.06);return true}});return e}
 function decorHomes(){decor.forEach(o=>{worldRoot.remove(o);if(o.geometry)o.geometry.dispose()});decor=[];houses.forEach(h=>h.owned=0);G.homes.filter(q=>q.w===W.id).forEach(q=>{const h=houses[q.hi];if(!h)return;h.owned=q.t;const lab=labelSprite('Uyim','#f7b81f','#10204a');lab.position.set(h.x,h.y+h.H+6,h.z);lab.scale.set(7,1.75,1);worldRoot.add(lab);decor.push(lab);
   const b=new B(),so=Object.assign({},O),W_=h.w/2,D=h.d/2;at(0,0,0,0);
@@ -1135,12 +1210,12 @@ bind('bWorld',()=>{renderWorld();$('worldP').hidden=false;beep(740,.08)});
 let FLY=null,flyS=null,flyCam=null,flyPlane=null,flyCl=null;
 function ensureFly(){if(flyS)return;flyS=new T.Scene();flyS.background=new T.Color(0x56b6ee);flyS.add(new T.HemisphereLight(0xffffff,0xa9c9dd,.72));const d=new T.DirectionalLight(0xfff2d0,.6);d.position.set(-.4,1,.5);flyS.add(d);const sw=WIND;WIND=0;at(0,0,0,0);const b=new B();planeGeo(b);WIND=sw;flyPlane=new T.Mesh(b.geo(),worldMat);flyS.add(flyPlane);flyCam=new T.PerspectiveCamera(60,innerWidth/innerHeight,1,1500);flyCl=new T.InstancedMesh(cloudGeo,clouds.material,40);flyCl.frustumCulled=false;flyS.add(flyCl);flyCl.userData=Array.from({length:40},(_,i)=>({x:(Math.random()-.5)*340,y:-55-Math.random()*90,z:Math.random()*760-380,s:.8+Math.random()*1.5}))}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function flyTo(id){if(FLY)return;if(G.jail){toast('Qamoqdasiz, ucha olmaysiz');return}const w=WORLDS[id],price=G.jet?0:w.price;if(!G.jet&&!nearAirport()){toast('Avval aeroportga boring');return}if(price&&!spend(price))return;document.querySelectorAll('.panel').forEach(p=>p.hidden=true);persist();ensureFly();if(me.car){me.car=null;if(G.taxi)G.taxi=null}me.char.visible=true;me.char.rotation.x=0;
+async function flyTo(id){if(FLY)return;if(G.jail){toast('Qamoqdasiz, ucha olmaysiz');return}if(G.wanted>0){toast('Politsiya izlayapti: aeroportga kiritishmaydi');return}const w=WORLDS[id],price=G.jet?0:w.price;if(!G.jet&&!nearAirport()){toast('Avval aeroportga boring');return}if(price&&!spend(price))return;document.querySelectorAll('.panel').forEach(p=>p.hidden=true);persist();ensureFly();if(me.car){me.car=null;if(G.taxi)G.taxi=null}me.char.visible=true;me.char.rotation.x=0;
  ['top','side','acts','say','stamp'].forEach(i=>$(i).hidden=true);$('banner').classList.remove('show');started=false;FLY={t:0};$('flyN').textContent=w.name+'ga uchyapmiz';$('flyS').textContent='Samolyot ko‘tarilmoqda…';$('flyI').style.width='5%';$('flyO').hidden=false;beep(160,1.5,'sawtooth',.02);fanfare();
  await sleep(2300);await build(id);G.world=id;spawnAt(airports[0]?{x:airports[0].x,z:airports[0].z+8,lx:airports[0].x,lz:airports[0].z-4}:null);await sleep(500);
  FLY=null;$('flyO').hidden=true;['top','side','acts'].forEach(i=>$(i).hidden=false);started=true;me.region=-1;refreshDebts();setCounts();makePet();persist();sendPresence(true);setTimeout(()=>{if(me.region>=0)banner(w.name,'Xush kelibsiz! '+R[me.region].n)},200)}
 function spawnAt(o){const s=byId[W.start];const x=o?o.x:s.x-Math.sin(s.ldir)*14,z=o?o.z:s.z-Math.cos(s.ldir)*14,lx=o?o.lx:s.lx,lz=o?o.lz:s.lz;me.x=x;me.z=z;me.y=groundAt(x,z)+.5;me.vy=0;me.floor=0;me.climb=null;cam.yaw=Math.atan2(lx-x,lz-z);me.face=cam.yaw;cam.x=x-Math.sin(cam.yaw)*14;cam.z=z-Math.cos(cam.yaw)*14;cam.y=me.y+8;me.inside=null}
-let ctxArm=false,ctxMode='',ctxStore=null;function ctxAct(){if(ctxMode==='peer'&&ctxPeer){peerMenu(ctxPeer);return}if(ctxMode==='job'){jobAct();return}if(ctxMode==='stair'){startClimb(ctxStair);return}if(ctxMode==='bail'){showCard('Garov','Sud','Garov: '+bailCost()+' tanga (qarz va 1000 tanga). Tugmani yana bosing.',5000);if(ctxArm){ctxArm=false;payBail()}else{ctxArm=true;setTimeout(()=>ctxArm=false,5000)}return}if(ctxMode==='fuel'){const c=me.car,need=100-(c.fuel===undefined?100:c.fuel),cost=Math.ceil(need*3);if(cost>0&&spend(Math.min(cost,Math.max(Math.floor(G.money),1)))){c.fuel=100;burst(c.x,c.y+1.5,c.z,0xf7c744,8,3,.2);toast('Bak to‘ldi: '+cost+' tanga')}return}if(ctxMode==='shop')openShop(ctxStore.type);else if(ctxMode==='air'){renderWorld();$('worldP').hidden=false}else if(ctxMode==='taxi'&&taxiBot)startTaxi(taxiBot)}
+let ctxArm=false,ctxMode='',ctxStore=null;function ctxAct(){if(ctxMode==='rob'&&ctxRob){startRob(ctxRob);return}if(ctxMode==='dig'){digTap();return}if(ctxMode==='sleep'){sleepHome();return}if(ctxMode==='peer'&&ctxPeer){peerMenu(ctxPeer);return}if(ctxMode==='job'){jobAct();return}if(ctxMode==='stair'){startClimb(ctxStair);return}if(ctxMode==='bail'){showCard('Garov','Sud','Garov: '+bailCost()+' tanga (qarz va 1000 tanga). Tugmani yana bosing.',5000);if(ctxArm){ctxArm=false;payBail()}else{ctxArm=true;setTimeout(()=>ctxArm=false,5000)}return}if(ctxMode==='fuel'){const c=me.car,need=100-(c.fuel===undefined?100:c.fuel),cost=Math.ceil(need*3);if(cost>0&&spend(Math.min(cost,Math.max(Math.floor(G.money),1)))){c.fuel=100;burst(c.x,c.y+1.5,c.z,0xf7c744,8,3,.2);toast('Bak to‘ldi: '+cost+' tanga')}return}if(ctxMode==='shop')openShop(ctxStore.type);else if(ctxMode==='air'){renderWorld();$('worldP').hidden=false}else if(ctxMode==='taxi'&&taxiBot)startTaxi(taxiBot)}
 const TUNE=[220,0,261.6,293.7,329.6,0,293.7,261.6,220,0,196,220,261.6,0,246.9,220];let tuneI=0;
 setInterval(()=>{if(!started||!G.snd||!AC||document.hidden)return;const f=TUNE[tuneI++%16];if(f)beep(f*2,.34,'triangle',.022)},340);
 
@@ -1259,10 +1334,10 @@ const peers=new Map();let room=null,sayIdx=-1,sayAt=0,lastSend=0,sayUntil=0;
 function setOnline(){const n=room?1+[...peers.values()].filter(p=>p.has).length:0;$('onDot').classList.toggle('on',!!room);$('nOn').textContent=room?(n+' kishi'):'Yakka'}
 function peerObj(id){let p=peers.get(id);if(!p){p={id,x:0,y:0,z:0,tx:0,ty:0,tz:0,r:0,tr:0,c:-1,n:'',v:0,has:false,sayv:-1,obj:null,car:null,lab:null,vis:0};peers.set(id,p)}return p}
 function applyPresence(pr,sender){if(sender.isMe&&sender.sameTab)return;const p=peerObj(sender.peer),q=pr||{};if(!Number.isFinite(q.x)||!Number.isFinite(q.z))return;
- const x=clamp(q.x,-5000,5000),z=clamp(q.z,-5000,5000),y=clamp(Number.isFinite(q.y)?q.y:0,-10,400),c=clamp((q.c|0),0,11),n=String(q.n==null?'Yo‘lchi':q.n).replace(/[\u0000-\u001f]/g,'').slice(0,14)||'Yo‘lchi',w=WORLDS[q.w]?String(q.w):'uz',md=CARS[q.m]?String(q.m):'hatch',ar=Array.isArray(q.o)?q.o:[],o={h:clamp(ar[0]|0,-1,7),g:clamp(ar[1]|0,0,2),p:clamp(ar[2]|0,0,2)},fmy=typeof q.fm==='string'&&q.fm===myId,key=[c,n,o.h,o.g,o.p,md,fmy?1:0].join('|');
+ const x=clamp(q.x,-5000,5000),z=clamp(q.z,-5000,5000),y=clamp(Number.isFinite(q.y)?q.y:0,-10,400),c=clamp((q.c|0),0,11),n=String(q.n==null?'Yo‘lchi':q.n).replace(/[\u0000-\u001f]/g,'').slice(0,14)||'Yo‘lchi',w=WORLDS[q.w]?String(q.w):'uz',md=CARS[q.m]?String(q.m):'hatch',ar=Array.isArray(q.o)?q.o:[],o={h:clamp(ar[0]|0,-1,8),g:clamp(ar[1]|0,0,2),p:clamp(ar[2]|0,0,2),fem:ar[3]?1:0,sk:clamp(ar[4]|0,0,4)},fmy=typeof q.fm==='string'&&q.fm===myId,key=[c,n,o.h,o.g,o.p,md,fmy?1:0,o.fem,o.sk].join('|');
  p.tx=x;p.ty=y;p.tz=z;p.tr=Number.isFinite(q.r)?q.r:0;p.v=q.v?1:0;p.w=w;p.sp=Number.isFinite(q.s)?clamp(q.s,0,110):0;
- if(p.key!==key){if(p.obj)scene.remove(p.obj);if(p.car)scene.remove(p.car);p.obj=makeChar(c,0,false,o);p.lab=labelSprite(n+(fmy?' ♥':''),'#'+COLS[c].toString(16).padStart(6,'0'),c===7?'#10204a':'#ffffff');p.lab.position.y=3.75;p.obj.add(p.lab);scene.add(p.obj);p.car=makeCar(COLS[c],md);p.car.visible=false;scene.add(p.car);if(!p.has){p.x=x;p.y=y;p.z=z}p.c=c;p.n=n;p.key=key;p.sayv=-1}
- p.has=true;p.pid=typeof q.id==='string'?q.id.slice(0,12):'';p.jb=typeof q.jb==='string'?q.jb.slice(0,24):'';p.js=clamp(q.js|0,0,2);p.fm=typeof q.fm==='string'?q.fm.slice(0,12):'';procPresenceEv(p,q);
+ if(p.key!==key){if(p.obj)scene.remove(p.obj);if(p.car)scene.remove(p.car);p.obj=makeChar(c,o.fem?1:0,false,o);p.lwp=0;p.lab=labelSprite(n+(fmy?' ♥':''),'#'+COLS[c].toString(16).padStart(6,'0'),c===7?'#10204a':'#ffffff');p.lab.position.y=3.75;p.obj.add(p.lab);scene.add(p.obj);p.car=makeCar(COLS[c],md);p.car.visible=false;scene.add(p.car);if(!p.has){p.x=x;p.y=y;p.z=z}p.c=c;p.n=n;p.key=key;p.sayv=-1}
+ p.has=true;p.pid=typeof q.id==='string'?q.id.slice(0,12):'';p.jb=typeof q.jb==='string'?q.jb.slice(0,24):'';p.js=clamp(q.js|0,0,2);p.wp=clamp(q.wp|0,0,2);p.sn=q.sn|0;p.pn=q.pn|0;p.rd=typeof q.rd==='string'?q.rd.slice(0,12):'';p.st=clamp(q.st|0,0,3);p.ko=q.ko?1:0;p.fm=typeof q.fm==='string'?q.fm.slice(0,12):'';procPresenceEv(p,q);
  const si=(q.sy|0)>=0&&q.sy!==undefined&&q.sy!==null?(q.sy|0):-1;if(si!==p.sayv){p.sayv=si;setBubble(p.obj,si);if(si>=0&&SAYS[si]&&w===W.id&&Math.hypot(x-me.x,z-me.z)<80)speak(SAYS[si])}}
 function dropPeer(id){const p=peers.get(id);if(!p)return;if(p.obj)scene.remove(p.obj);if(p.car)scene.remove(p.car);peers.delete(id)}
 // PeerJS: umumiy xona, ovoz proximity bilan
@@ -1282,7 +1357,7 @@ function callPeer(id){if(!net||!micStream||net.called.has(id)||id===net.id)retur
 bind('bMic',async()=>{if(micStream){micStream.getTracks().forEach(t=>t.enabled=!t.enabled);const on=micStream.getTracks()[0].enabled;$('bMic').textContent=on?'Mikrofon yoqiq':'Mikrofon o‘chiq';return}try{micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});$('bMic').textContent='Mikrofon yoqiq';$('bMic').style.background='#7ee2a0';peers.forEach((v,k)=>{if(net)net.called.delete(k);callPeer(k)});toast('Yaqin odamlar sizni eshitadi')}catch(e){toast('Mikrofonga ruxsat berilmadi')}});
 async function initRoom(){try{if(!window.claude||!window.claude.use){netStart();return setOnline()}const r=await window.claude.use('room');if(!r)return setOnline();room=r;r.onPeers(ch=>{ch.left.forEach(p=>dropPeer(p.peer));[...ch.joined,...ch.updated].forEach(p=>{try{applyPresence(p.presence,p)}catch(e){}});setOnline()},()=>{room=null;setOnline()})}catch(e){room=null}setOnline()}
 function doSay(i){speak(SAYS[i],true);sayIdx=i;sayAt=performance.now();sayUntil=sayAt+4500;setBubble(me.char,i);beep(620,.08);sendPresence(true)}
-function sendPresence(force){const n=performance.now();if(!room||(!force&&n-lastSend<100)||!W)return;lastSend=n;const c=me.car;try{room.presence({x:+(c?c.x:me.x).toFixed(1),y:+(c?c.y:me.y).toFixed(1),z:+(c?c.z:me.z).toFixed(1),r:+(c?c.h:me.face).toFixed(2),v:c?1:0,s:+(c?Math.abs(c.speed):me.speed).toFixed(1),n:G.name,c:G.color,sy:sayIdx,w:W.id,id:myId,jb:jobKey(),js:JOB&&JOB.slot||0,fm:G.fam?G.fam.id:'',ev:OUT.slice(-6).map(e=>[e.k,e.to,e.t,e.a]),ak:ACK.slice(-16),m:c?c.model:'hatch',o:[G.o.h===undefined?-1:G.o.h|0,G.o.g|0,G.o.p|0]}).catch(()=>{})}catch(e){}}
+function sendPresence(force){const n=performance.now();if(!room||(!force&&n-lastSend<100)||!W)return;lastSend=n;const c=me.car;try{room.presence({x:+(c?c.x:me.x).toFixed(1),y:+(c?c.y:me.y).toFixed(1),z:+(c?c.z:me.z).toFixed(1),r:+(c?c.h:me.face).toFixed(2),v:c?1:0,s:+(c?Math.abs(c.speed):me.speed).toFixed(1),n:G.name,c:G.color,sy:sayIdx,w:W.id,id:myId,jb:jobKey(),js:JOB&&JOB.slot||0,fm:G.fam?G.fam.id:'',ev:OUT.slice(-6).map(e=>[e.k,e.to,e.t,e.a]),ak:ACK.slice(-16),m:c?c.model:'hatch',o:[G.o.h===undefined?-1:G.o.h|0,G.o.g|0,G.o.p|0,G.o.fem?1:0,G.o.sk|0],wp:G.wsel|0,sn:me.shotN|0,pn:me.punchN|0,rd:me.ride?me.ride.pid:'',st:me.ride?me.ride.seat:0,ko:me.out?1:0}).catch(()=>{})}catch(e){}}
 
 // ---------- O‘yinchilar orasida: pul, oila, urib ketish ----------
 const OUT=[],ACK=[],SEEN=new Set(),mpQ=[];let evN=0,ctxPeer=null;
@@ -1309,11 +1384,86 @@ function onEv(p,t,a){
  else if(t==='fam'){if(G.fam){sendEv(p,'famno',1);return}modal('Oila qurish taklifi',p.n+' siz bilan oila qurishni taklif qilyapti. Rozimisiz?',null,[['Roziman',()=>{if(G.fam)return;sendEv(p,'famok',0);setFam(p)}],['Yo‘q',()=>sendEv(p,'famno',0),'#fffdf6']])}
  else if(t==='famok'){if(G.famAsk!==p.pid||G.fam)return;G.famAsk=null;setFam(p)}
  else if(t==='famno'){G.famAsk=null;showCard('Oila',p.n,a?p.n+'ning oilasi bor ekan.':p.n+' taklifni rad etdi.')}
+ else if(t==='dmg'){takeDmg(p,a)}else if(t==='ko'){showCard('G‘alaba',p.n,'Siz '+p.n+'ni yiqitdingiz!',4000)}
  else if(t==='div'){if(G.fam&&G.fam.id===p.pid){G.fam=null;persist();refreshChar();showCard('Oila',p.n,p.n+' oilani tark etdi.')}}}
-function checkPeerHits(now){const c=me.car;if(!c||Math.abs(c.speed)<8)return;peers.forEach(p=>{if(!p.has||!p.pid||p.v||p.w!==W.id)return;if(Math.hypot(p.x-c.x,p.z-c.z)<3.6&&Math.abs(p.y-c.y)<3&&now>(p.hitCd||0)){p.hitCd=now+20000;sendEv(p,'hit',Math.round(Math.abs(c.speed)));c.speed*=.3;shake=.6;slow=.6;beep(95,.25,'square',.14);burst(p.x,p.y+1.5,p.z,[0xffffff,0xf7b81f,0xd8344f],16,8,.3);G.hits++;showCard('Voy!',p.n,'Siz '+p.n+'ni urib ketdingiz! U tovon narxini aytadi (1–10 000 tanga), to‘lashingiz shart.',7000)}})}
+function checkPeerHits(now){const c=me.car;if(!c||Math.abs(c.speed)<8)return;peers.forEach(p=>{if(!p.has||!p.pid||p.v||p.rd||p.w!==W.id)return;if(Math.hypot(p.x-c.x,p.z-c.z)<3.6&&Math.abs(p.y-c.y)<3&&now>(p.hitCd||0)){p.hitCd=now+20000;sendEv(p,'hit',Math.round(Math.abs(c.speed)));c.speed*=.3;shake=.6;slow=.6;beep(95,.25,'square',.14);burst(p.x,p.y+1.5,p.z,[0xffffff,0xf7b81f,0xd8344f],16,8,.3);G.hits++;showCard('Voy!',p.n,'Siz '+p.n+'ni urib ketdingiz! U tovon narxini aytadi (1–10 000 tanga), to‘lashingiz shart.',7000)}})}
 function jobKey(){const J=JOB;if(!J)return'';if(J.id==='cashier')return'c'+shops.indexOf(J.store);if(J.id==='cleaner')return'f'+(J.city?J.city.id:'');if(J.id==='bus')return'b'+(J.city?J.city.id:'');return J.id}
 function teamOf(key){const a=[];if(!key)return a;peers.forEach(p=>{if(p.has&&p.w===W.id&&p.jb===key)a.push(p)});return a}
 function jobPay(n){const tm=JOB?teamOf(jobKey()):[],fam=G.fam&&tm.some(p=>p.pid===G.fam.id),v=Math.round(n*(1+.2*tm.length+(fam?.1:0)));addMoney(v);if(JOB)JOB.earned+=v;return v}
+
+// ---------- Jang, qurol, politsiya, qochish, uxlash, yo‘lovchi ----------
+const WPN=[{n:'Musht',r:2.8,dmg:34,pd:10,cd:.42},{n:'Pistolet',r:45,dmg:50,pd:22,cd:.36,gun:1},{n:'Avtomat',r:70,dmg:34,pd:13,cd:.11,gun:2,auto:1}];
+G.guns=save.gn&&typeof save.gn==='object'?{1:!!save.gn[1],2:!!save.gn[2]}:{};G.ammo=clamp(save.am|0,0,99999);G.armor=save.ar?1:0;G.hp=save.hp>0?clamp(+save.hp,1,100):100;G.wanted=clamp(+save.wl||0,0,5);G.wsel=0;G.o=G.o||{};
+G.q=save.q!==undefined?clamp(save.q|0,0,2):((Math.min(innerWidth,innerHeight)<600||/Android|iPhone|iPad/i.test(navigator.userAgent))?1:2);
+function applyQ(){const q=G.q;pr=[.75,1,Math.min(window.devicePixelRatio||1,1.6)][q];renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false);shadowsOn=q>0;sun.castShadow=shadowsOn;VIEW=[380,540,680][q];scene.fog.far=VIEW;scene.fog.near=VIEW*.34;camera.far=VIEW+350;camera.updateProjectionMatrix();BOTD=[70,95,115][q]}
+let atkHeld=false,atkCd=0,ctxRob=null,dmgT=0,wantT=0,lastCrime=0,sirenT=0,digM=null;const cops=[],trM=new T.LineBasicMaterial({color:0xffe27a,transparent:true,opacity:.95,toneMapped:false}),gunG={};
+function gunGeo(k){if(gunG[k])return gunG[k];const b=new B(),sw=WIND;WIND=0;at(0,0,0,0);if(k===1){b.soft(0,-.06,.12,.13,.2,.46,0x2a2d35,.04);b.soft(0,-.3,-.04,.12,.28,.15,0x3a2a1c,.03)}else{b.soft(0,-.08,.3,.15,.22,1.1,0x22262e,.04);b.soft(0,-.12,-.35,.12,.26,.42,0x6b4a2e,.05);b.soft(0,-.36,.28,.1,.3,.15,0x2a2d35,.03)}WIND=sw;return gunG[k]=b.geo()}
+function setGun(o,k){if(!o)return;const u=o.userData;if(u.gun){u.ra.remove(u.gun);u.gun=null}if(k>0){const m=new T.Mesh(gunGeo(k),worldMat);m.position.set(0,-.86,.06);m.rotation.x=Math.PI/2;u.ra.add(m);u.gun=m}}
+function updWpn(){const w=WPN[G.wsel]||WPN[0];$('atkBtn').textContent=G.wsel?'Otish':'Musht';$('wpnBtn').textContent=G.wsel?w.n+' · '+G.ammo:'Qo‘l';if(me.char)setGun(me.char,G.wsel)}
+function nextWpn(){const own=[0].concat([1,2].filter(k=>G.guns[k]));G.wsel=own[(own.indexOf(G.wsel)+1)%own.length];updWpn();beep(500,.05);sendPresence(true)}
+function updWant(){const n=Math.ceil(G.wanted),c=$('wantC');c.hidden=!n;if(n)c.textContent='Politsiya '+'★'.repeat(n)+'☆'.repeat(5-n)}
+function crime(n,why){if(n<=0||G.jail)return;const was=Math.ceil(G.wanted);G.wanted=Math.min(5,G.wanted+n);lastCrime=performance.now();wantT=0;if(Math.ceil(G.wanted)>was){siren(1);toast((why?why+'! ':'')+'Politsiya sizni izlayapti')}updWant()}
+function tracer(x0,y0,z0,x1,y1,z1){const g=new T.BufferGeometry().setFromPoints([new T.Vector3(x0,y0,z0),new T.Vector3(x1,y1,z1)]),l=new T.Line(g,trM);scene.add(l);let t0=0;anims.push(t=>{if(!t0)t0=t;if(t-t0>70){scene.remove(l);g.dispose();return true}})}
+function pickTarget(r,cone,yaw){let best=null,bs=1e9;const fx=Math.sin(yaw),fz=Math.cos(yaw),test=(x,y,z,o)=>{const dx=x-me.x,dz=z-me.z,d=Math.hypot(dx,dz);if(d>r||d<.2||Math.abs(y-me.y)>4)return;const ang=Math.acos(clamp((dx*fx+dz*fz)/d,-1,1));if(ang>cone)return;const s=ang*25+d;if(s<bs){bs=s;best=Object.assign({x,y,z},o)}};
+ for(const b of bots)if(b.obj&&b.obj.visible&&!b.fly&&!b.down&&!b.inTaxi&&!b.away)test(b.x,b.y,b.z,{bot:b});peers.forEach(p=>{if(p.has&&p.pid&&p.w===W.id&&!p.v&&!p.rd&&!p.ko)test(p.x,p.y,p.z,{peer:p})});return best}
+function attack(now){if(me.car||me.ride||G.jail||me.climb||me.ko>0||me.out||FLY||me.arrest||!me.char)return;const w=WPN[G.wsel]||WPN[0];if(now<atkCd)return;atkCd=now+w.cd*1000;
+ if(w.gun){if(G.ammo<=0){toast('O‘q tugadi! Qurol do‘konidan oling.');beep(200,.06);atkHeld=false;return}G.ammo--}
+ const yaw=cam.yaw,tg=pickTarget(w.r,w.gun?.3:1,yaw);me.face=tg?Math.atan2(tg.x-me.x,tg.z-me.z):yaw;me.char.rotation.y=me.face;
+ if(w.gun){me.shotN=(me.shotN||0)+1;const f=me.face,hx=me.x+Math.sin(f)*1.1+Math.cos(f)*.5,hz=me.z+Math.cos(f)*1.1-Math.sin(f)*.5,hy=me.y+2,ex=tg?tg.x:me.x+Math.sin(f)*w.r,ez=tg?tg.z:me.z+Math.cos(f)*w.r;tracer(hx,hy,hz,ex,tg?tg.y+1.7:hy,ez);spawnP(hx,hy,hz,0,0,0,.55,0xffe27a,.08,0);beep(w.gun===2?180:240,.07,'square',.09);shake=Math.max(shake,.08);
+  for(const b of bots)if(b.obj&&b.obj.visible&&!b.down&&!b.house&&!b.store&&Math.hypot(b.x-me.x,b.z-me.z)<40)b.flee=now+6000;if(!tg)crime(.25,'Otishma')}
+ else{me.punchN=(me.punchN||0)+1;me.punchT=now+260;beep(150,.07,'square',.07)}
+ if(tg){if(tg.bot)hurtBot(tg.bot,w,now);else if(tg.peer){tg.peer.pend=(tg.peer.pend||0)+w.pd;burst(tg.x,tg.y+1.8,tg.z,[0xffffff,0xd8344f],6,4,.25);crime(w.gun?.4:.2,w.gun?'Otishma':'Janjal')}}
+ updWpn();sendPresence(true)}
+function hurtBot(b,w,now){b.hp=(b.hp===undefined?100:b.hp)-w.dmg;burst(b.x,b.y+1.8,b.z,w.gun?[0xffffff,0xd8344f]:[0xffffff,0xf7b81f],w.gun?8:6,4,.25);if(!b.house&&!b.store)b.flee=now+7000;say(b,['Voy!','Nima qilyapsiz?!','Yordam bering!','Politsiya!'][Math.floor(Math.random()*4)],1800,now);
+ if(b.hp<=0&&!b.down){b.down=now;b.flee=0;if(Math.random()<.6){const m=20+Math.floor(Math.random()*80);G.money+=m;setCounts();toast('+'+m+' tanga tushib qoldi')}}crime(w.gun?1:.5,w.gun?'Otishma':'Janjal')}
+function takeDmg(p,a){if(me.out||G.jail)return;const d=a*(G.armor?.5:1);G.hp=Math.max(0,G.hp-d);$('hurt').style.opacity=1;setTimeout(()=>$('hurt').style.opacity=0,230);beep(140,.08,'square',.06);shake=Math.max(shake,.25);if(G.hp<=0)knockOut(p)}
+function knockOut(p){if(me.ride)exitRide();if(me.car){me.car.speed=0;carToggle()}me.out=true;atkHeld=false;me.ko=3.6;me.vy=9;me.kx=0;me.kz=0;if(p)sendEv(p,'ko',0);banner('Hushdan ketdingiz',p?p.n+' sizni yiqitdi':'');setTimeout(hospital,3500)}
+function hospital(){const c=nearestCity(),fee=Math.min(300,Math.max(0,Math.floor(G.money)));G.money-=fee;me.out=false;G.hp=100;me.floor=0;me.climb=null;me.inside=null;me.ko=0;const a=Math.random()*TAU;me.x=c.x+Math.cos(a)*22;me.z=c.z+Math.sin(a)*22;me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z;cam.y=me.y+8;if(me.char){me.char.visible=true;me.char.rotation.x=0}setCounts();persist();showCard('Kasalxona','Shifokor','Davolandingiz, jon 100%. To‘lov: '+fee+' tanga.',6000)}
+function myPose(now){const u=me.char.userData;if(G.wsel>0){u.ra.rotation.x=-1.45;if(G.wsel===2)u.la.rotation.x=-1.25}if(now<(me.punchT||0))u.ra.rotation.x=-1.8*Math.sin((me.punchT-now)/260*Math.PI);if(now<(me.digT||0)){u.ra.rotation.x=u.la.rotation.x=-.7+Math.sin(now*.03)*.7}}
+function peerPose(p,now){const u=p.obj.userData;if(p.wp!==p.lwp){setGun(p.obj,p.wp);p.lwp=p.wp}if(p.ko){p.obj.rotation.x=-Math.PI/2;p.obj.position.y+=.3;return}p.obj.rotation.x=0;
+ if(p.pn!==p.lpn){if(p.lpn!==undefined)p.punchT=now+260;p.lpn=p.pn}
+ if(p.sn!==p.lsn){if(p.lsn!==undefined&&p.wp){const f=p.r,hx=p.x+Math.sin(f)*1.1+Math.cos(f)*.5,hz=p.z+Math.cos(f)*1.1-Math.sin(f)*.5;tracer(hx,p.y+2,hz,hx+Math.sin(f)*45,p.y+2,hz+Math.cos(f)*45);spawnP(hx,p.y+2,hz,0,0,0,.5,0xffe27a,.08,0);const d=Math.hypot(p.x-me.x,p.z-me.z);if(d<90)beep(p.wp===2?180:240,.06,'square',.07*Math.max(.15,1-d/90))}p.lsn=p.sn}
+ if(p.wp>0){u.ra.rotation.x=-1.45;if(p.wp===2)u.la.rotation.x=-1.25}if(now<(p.punchT||0))u.ra.rotation.x=-1.8*Math.sin((p.punchT-now)/260*Math.PI)}
+function combatStep(dt,now){if(atkHeld&&(WPN[G.wsel]||{}).auto)attack(now);dmgT-=dt;if(dmgT<=0){dmgT=.3;peers.forEach(p=>{if(p.pend){sendEv(p,'dmg',Math.min(200,Math.round(p.pend)));p.pend=0}})}if(!me.out&&G.hp<100)G.hp=Math.min(100,G.hp+dt*.35)}
+// politsiya
+function spawnCop(){for(let k=0;k<12;k++){const a=Math.random()*TAU,r=90+Math.random()*40,x=me.x+Math.cos(a)*r,z=me.z+Math.sin(a)*r;if(collides(x,z,3,3)||houseAt(x,z)||groundAt(x,z)<.3||regionAt(x,z).d>BOUND)continue;const g=makeCar(0xf3f5f7,'police');worldRoot.add(g);cops.push({g,x,z,y:groundAt(x,z),h:Math.atan2(me.x-x,me.z-z),sp:0});return}}
+function clearCops(){cops.forEach(c=>worldRoot.remove(c.g));cops.length=0}
+function updateCops(dt,now){if(G.jail||me.arrest||FLY||!started){if(cops.length)clearCops();return}
+ const want=G.wanted>0?Math.min(3,Math.ceil(G.wanted)):0;if(cops.length<want&&Math.random()<dt*.8)spawnCop();while(cops.length>want){const c=cops.pop();worldRoot.remove(c.g)}
+ let near=1e9;for(const c of cops){const dx=me.x-c.x,dz=me.z-c.z,d=Math.hypot(dx,dz);near=Math.min(near,d);if(d>420){const a=Math.random()*TAU;c.x=me.x+Math.cos(a)*120;c.z=me.z+Math.sin(a)*120;c.sp=0;continue}
+  const dh=Math.atan2(Math.sin(Math.atan2(dx,dz)-c.h),Math.cos(Math.atan2(dx,dz)-c.h));c.h+=clamp(dh,-2.4*dt,2.4*dt);const vmax=Math.min(32+G.wanted*7,Math.max(5,d*1.1));c.sp=lerp(c.sp,Math.abs(dh)>1.2?vmax*.4:vmax,Math.min(1,dt*1.5));
+  c.x+=Math.sin(c.h)*c.sp*dt;c.z+=Math.cos(c.h)*c.sp*dt;const p={x:c.x,z:c.z,y:c.y};if(resolve(p,2.2)){c.x=p.x;c.z=p.z;c.sp*=.6;c.h+=(Math.random()-.5)*1.4}c.y=groundAt(c.x,c.z);
+  c.g.position.set(c.x,c.y,c.z);c.g.rotation.y=c.h;c.g.userData.wh.forEach(w=>w.children[0].rotation.x+=c.sp*dt*1.5);const L=c.g.userData.lights,on=Math.floor(now/170)%2;L[0].visible=!!on;L[1].visible=!on;
+  if(d<5.5&&(!me.car||Math.abs(me.car.speed)<9)&&!me.inside&&!me.out){startArrest('crime');return}if(me.car&&d<4.5){me.car.speed*=.6;shake=.4}}
+ if(want&&now>sirenT&&near<160){sirenT=now+1700;beep(near<60?880:660,.25,'square',.035)}
+ if(G.wanted>0&&(near>150||me.inside||!cops.length)&&now-lastCrime>8000){wantT+=dt*(me.inside?.6:1);if(wantT>20){wantT=0;G.wanted=Math.max(0,Math.ceil(G.wanted)-1);updWant();toast(G.wanted?'Qidiruv kamaydi':'Politsiya sizni yo‘qotdi');persist()}}else if(near<150)wantT=0}
+// o'marish
+function robCtx(){const h=me.inside;if(!h||!h.store||me.car||!G.wsel||me.rob||G.jail)return null;if(JOB&&JOB.id==='cashier')return null;const q=shops.find(s=>s.store===h);if(!q||performance.now()<(q.robbed||0))return null;return Math.hypot(me.x-q.cx,me.z-q.cz)<10?q:null}
+function startRob(q){if(me.rob)return;me.rob={q,t:0};const c=bots.find(b=>b.kind==='clerk'&&b.store===q);if(c){c.hands=performance.now()+9000;say(c,'Otmang! Hozir pul beraman!',3500)}crime(3,'Do‘kon o‘marilyapti');beep(900,.3,'sawtooth',.06)}
+function updRob(dt,now){const r=me.rob,q=r.q;r.t+=dt;if(G.jail||Math.hypot(me.x-q.cx,me.z-q.cz)>12){me.rob=null;return}if(r.t>=5){me.rob=null;q.robbed=now+300000;const m=1500+Math.floor(Math.random()*26)*100;G.money+=m;setCounts();bumpMoney();persist();burst(me.x,me.y+2.5,me.z,0xffc41f,24,6,.3);showCard('+'+m,'O‘marish','Kassadan '+m+' tanga oldingiz. Endi politsiyadan qoching!',6000);crime(1)}}
+// qamoqdan qochish
+function updDig(){const J=G.jail;if(!J||!J.dx){if(digM){scene.remove(digM);digM=null}return}if(!digM){digM=new T.Mesh(new T.CircleGeometry(1,18),new T.MeshBasicMaterial({color:0x3a2614}));digM.rotation.x=-Math.PI/2;scene.add(digM)}digM.position.set(J.dx,groundAt(J.dx,J.dz)+.06,J.dz);digM.scale.setScalar(.35+(J.dig||0)/100*1.3)}
+function digTap(){const J=G.jail;if(!J)return;const now=performance.now();if(now-(J.lt||0)<170)return;J.lt=now;if(!J.dx||Math.hypot(me.x-J.dx,me.z-J.dz)>2.6){if((J.dig||0)>5&&J.dx){toast('Tunnelingiz boshqa joyda (qora chuqur)');return}J.dx=me.x;J.dz=me.z;J.dig=0}
+ J.dig=Math.min(100,(J.dig||0)+2);me.digT=now+350;burst(me.x,me.y+.3,me.z,[0x8a5a34,0x6b4a2e,0xb08a5c],6,3,.3,10);beep(110+Math.random()*60,.05,'square',.05);
+ if(J.dig>25&&J.dig<95&&Math.random()<.025){J.dig=Math.max(0,J.dig-40);J.left+=180;shake=.4;siren(1);showCard('Qo‘riqchi','Ushlandingiz!','Qo‘riqchi tunnelni ko‘rib qoldi va ko‘mib tashladi. Muddat 3 daqiqaga uzaydi.',6000)}
+ updDig();if(J.dig>=100)escapeJail()}
+function escapeJail(){const q=jailSpot,fd=$('fade');fd.style.background='#000';fd.style.opacity=1;setTimeout(()=>{G.jail=null;updDig();if(q){me.x=q.x+(Math.random()-.5)*20;me.z=q.zmin-38}me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z+10;cam.y=me.y+8;G.wanted=Math.max(G.wanted,4);updWant();persist();setTimeout(()=>{fd.style.opacity=0;setTimeout(()=>fd.style.background='#fff',400);fanfare();banner('Qochdingiz!','Politsiya sizni qidiryapti');burst(me.x,me.y+.5,me.z,[0x8a5a34,0x6b4a2e],24,6,.4,10)},600)},700)}
+// uxlash
+function sleepHome(){const fd=$('fade');fd.style.background='#000';fd.style.opacity=1;banner('Zzz…','Uxlayapsiz');beep(300,.6,'sine',.04);setTimeout(()=>{dayT=(dayT+.42)%1;const bed=!!G.own.bed;G.energy=bed?100:75;G.hp=100;persist();setTimeout(()=>{fd.style.opacity=0;setTimeout(()=>fd.style.background='#fff',400);showCard('Tong',bed?'Karavotda uxladingiz':'Polda uxladingiz',bed?'Yaxshi dam oldingiz! Quvvat va jon 100%.':'Karavot yo‘q ekan, polda uxladingiz. Quvvat 75%. Mebel do‘konidan karavot oling.',6000)},900)},2200)}
+// do'st mashinasida yo'lovchi (4 kishilik)
+function nearPeerCar(){let b=null,bd=8.5;peers.forEach(p=>{if(!p.has||!p.pid||!p.v||p.rd||p.w!==W.id)return;const d=Math.hypot(p.x-me.x,p.z-me.z);if(d<bd){bd=d;b=p}});return b}
+function seatsUsed(pid){let n=0;peers.forEach(q=>{if(q.has&&q.rd===pid)n++});return n}
+function enterRide(p){const n=seatsUsed(p.pid);if(n>=3){toast('Mashinada joy yo‘q: 4 kishilik');return}me.ride={pid:p.pid,seat:n+1};me.char.visible=false;atkHeld=false;beep(160,.15);toast(p.n+'ning mashinasiga o‘tirdingiz ('+(n+2)+'/4)');sendPresence(true)}
+function exitRide(){const p=me.ride&&peerById(me.ride.pid);me.ride=null;const r=p?p.r:me.face;me.x+=Math.cos(r)*3.6;me.z-=Math.sin(r)*3.6;me.y=groundAt(me.x,me.z)+.2;resolve(me,1);if(me.char){me.char.visible=true;me.char.rotation.x=0}beep(260,.08);sendPresence(true)}
+function updRide(dt){const p=peerById(me.ride.pid);if(!p||!p.v||p.w!==W.id){exitRide();toast('Haydovchi mashinadan tushdi');return}me.x=p.x;me.z=p.z;me.y=p.y;me.face=p.r;me.speed=0;me.grounded=true;me.vy=0;me.char.position.set(me.x,me.y,me.z);if(p.sp>3&&performance.now()-cam.touched>1400){const dd=Math.atan2(Math.sin(p.r-cam.yaw),Math.cos(p.r-cam.yaw));cam.yaw+=dd*Math.min(1,dt*2.6)}}
+// tugmalar
+(()=>{const a=$('atkBtn'),st=e=>{e.stopPropagation();e.preventDefault();atkHeld=true;attack(performance.now())},en=e=>{atkHeld=false};a.addEventListener('pointerdown',st);['pointerup','pointercancel','pointerleave'].forEach(k=>a.addEventListener(k,en))})();
+bind('wpnBtn',nextWpn);bind('bailBtn',()=>{if(!G.jail)return;modal('Garov','Garov: '+bailCost().toLocaleString('ru-RU')+' tanga (qarzlar ham uziladi). To‘laysizmi?',null,[['To‘lash',()=>payBail()],['Yo‘q',()=>{},'#fffdf6']])});
+addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT'||!started)return;if(e.code==='KeyQ'&&!e.repeat){atkHeld=true;attack(performance.now())}if(e.code==='KeyR')nextWpn()});addEventListener('keyup',e=>{if(e.code==='KeyQ')atkHeld=false});
+bind('bMenu',()=>{$('menuP').hidden=false;beep(740,.08)});$('mGrid').addEventListener('pointerdown',()=>{$('menuP').hidden=true},true);
+bind('bMap',()=>openMap());bind('bHow',()=>{$('howP').hidden=false});bind('bQ',()=>{G.q=(G.q+1)%3;applyQ();toast('Grafika: '+['Past','O‘rta','Yuqori'][G.q]);persist()});
+$('howB').addEventListener('click',()=>{$('howP').hidden=false});
+updWpn();updWant();
 
 // ---------- Kadr ----------
 let last=performance.now(),fpsT=0,fpsN=0,hudT=0,mood=0;const tmp=new T.Object3D();
@@ -1325,7 +1475,7 @@ let realDt=0;function tick(now){requestAnimationFrame(tick);realDt=Math.min((now
  if(slow>0){slow-=dt;dt*=.34}
  fpsN++;fpsT+=dt;if(fpsT>2.5){const fps=fpsN/fpsT;fpsN=0;fpsT=0;if(fps<27&&shadowsOn){shadowsOn=false;sun.castShadow=false;shadowMat.opacity=.28}else if(fps<24&&pr>.75){pr=Math.max(.75,pr-.3);renderer.setPixelRatio(pr);renderer.setSize(innerWidth,innerHeight,false)}else if(fps<20&&VIEW>380){VIEW=380;BOTD=70;scene.fog.far=VIEW;scene.fog.near=130}}
  dayCycle(dt);waterTex.offset.x=(now*.00002)%1;waterTex.offset.y=(now*.000012+Math.sin(now*.0006)*.012)%1;
- if(building){}else if(!started){const c=W&&byId[W.start];if(c&&c.lx!==undefined){const t=now*.00006;camera.position.set(c.lx+Math.sin(t)*120,c.h+50,c.lz+Math.cos(t)*120);camera.lookAt(c.lx,c.h+14,c.lz)}}
+ if(building){}else if(!started&&prevChar){const t=now*.0003,px=prevChar.position,pt=innerHeight>innerWidth,a=prevChar.rotation.y+Math.sin(t)*.45,D=pt?12:7;camera.position.set(px.x+Math.sin(a)*D,px.y+2.2,px.z+Math.cos(a)*D);camera.lookAt(px.x,px.y+(pt?-3.3:1.2),px.z);animChar(prevChar,0,dt,false)}else if(!started){const c=W&&byId[W.start];if(c&&c.lx!==undefined){const t=now*.00006;camera.position.set(c.lx+Math.sin(t)*120,c.h+50,c.lz+Math.cos(t)*120);camera.lookAt(c.lx,c.h+14,c.lz)}}
  else{step(dt,now);if(window.__freeCam){const f=window.__freeCam;camera.position.set(f.p[0],f.p[1],f.p[2]);camera.lookAt(f.t[0],f.t[1],f.t[2])}else updateCamera(dt)}
  sky.position.copy(camera.position);
  cloudD.forEach((c,i)=>{c.x+=dt*4;const x=((c.x-camera.position.x)%1800+1800)%1800-900+camera.position.x,z=((c.z-camera.position.z)%1800+1800)%1800-900+camera.position.z;tmp.position.set(x,c.y,z);tmp.scale.setScalar(c.s);tmp.rotation.set(0,i,0);tmp.updateMatrix();clouds.setMatrixAt(i,tmp.matrix)});clouds.instanceMatrix.needsUpdate=true;clouds.material.opacity=lerp(.38,.93,1-skyU.night.value);
@@ -1337,7 +1487,7 @@ let realDt=0;function tick(now){requestAnimationFrame(tick);realDt=Math.min((now
 let intT=0;
 function step(dt,now){
  const wasE=G.energy;G.energy=Math.max(0,G.energy-dt*(G.own.watch?.09:.13));if(wasE>=15&&G.energy<15)toast('Quvvat kam! Ovqatlaning.');
- let ix=input.jx+(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),iy=input.jy+(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0);if(me.ko>0||!$('hitP').hidden||me.enter||me.arrest||me.climb){ix=0;iy=0}const mag=Math.min(Math.hypot(ix,iy),1);
+ let ix=input.jx+(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),iy=input.jy+(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0);if(me.ko>0||!$('hitP').hidden||me.enter||me.arrest||me.climb||me.out||me.ride||me.rob){ix=0;iy=0}const mag=Math.min(Math.hypot(ix,iy),1);
  const run=(K.ShiftLeft||mag>.88)&&G.energy>8,boostM=now<G.boost?1.3:1;
  if(me.enter){const e=me.enter;e.t+=dt/.32;const t=Math.min(e.t,1);me.x=lerp(e.x,e.c.x,t);me.z=lerp(e.z,e.c.z,t);me.face=Math.atan2(e.c.x-e.x,e.c.z-e.z);me.char.position.set(me.x,me.y,me.z);me.char.rotation.y=me.face;animChar(me.char,9,dt,false);const two=e.c.g.userData.two;me.char.scale.setScalar(1.05*(two?1:1-t*.3));if(t>=1){me.enter=null;me.car=e.c;me.char.scale.setScalar(1.05);me.char.visible=!!two;if(two)setSeat(true);beep(160,.15);cam.yaw=me.car.h}}
  if(me.car){const c=me.car,st=CARS[c.model]||CARS.hatch,fw=-iy,ri=roadAt(c.x,c.z),road=ri.d<ri.w+2,mx=st.v*(road?(ri.w>8?1.3:1):(st.off?.9:.62));const prev=c.speed;
@@ -1350,7 +1500,7 @@ function step(dt,now){
   if(Math.abs(c.speed)>4&&Math.random()<dt*(road?9:26)){const f=-2.8*Math.sign(c.speed);spawnP(c.x+Math.sin(c.h)*f,c.y+.5,c.z+Math.cos(c.h)*f,(Math.random()-.5)*1.5,1.3,(Math.random()-.5)*1.5,road?.45:.75,road?0xbfc4cc:0xd5c7a2,.65,-1)}
   if(c.model!=='bike'){G.energy=Math.min(100,G.energy+dt*.05);c.fuel=c.fuel===undefined?100:c.fuel;if(Math.abs(c.speed)>1)c.fuel=Math.max(0,c.fuel-dt*(.05+Math.abs(c.speed)*.0022));if(c.fuel<=0){c.speed=clamp(c.speed,-5,7);if(now>(G.fuelW||0)){G.fuelW=now+15000;toast('Benzin tugadi! Eng yaqin AZSga boring.')}}}
   syncCar(c,dt);me.x=c.x;me.z=c.z;me.y=c.y;me.speed=Math.abs(c.speed);me.face=c.h;me.grounded=true;if(c.g.userData.two){me.char.position.set(c.x,c.y+.48,c.z);me.char.rotation.set(0,c.h,c.roll||0);setSeat(true);me.char.userData.b.rotation.x=.28}
- }else if(me.climb){updateClimb(dt)}else if(!me.enter){const fx=Math.sin(cam.yaw),fz=Math.cos(cam.yaw),rx=-fz,rz=fx,sp=(run?20:G.energy<4?8:12)*boostM*(mag>0?1:0);
+ }else if(me.climb){updateClimb(dt)}else if(me.ride){updRide(dt)}else if(!me.enter){const fx=Math.sin(cam.yaw),fz=Math.cos(cam.yaw),rx=-fz,rz=fx,sp=(run?20:G.energy<4?8:12)*boostM*(mag>0?1:0);
   let dx=(fx*-iy+rx*ix),dz=(fz*-iy+rz*ix);const l=Math.hypot(dx,dz)||1;dx/=l;dz/=l;
   const g0=groundAt(me.x,me.z),swim=g0<-.55,spd=sp*(swim?.55:1)*Math.max(mag,mag>0?.35:0);
   if(me.ko>0){me.ko-=dt;me.x+=(me.kx||0)*dt;me.z+=(me.kz||0)*dt;me.kx*=Math.pow(.15,dt);me.kz*=Math.pow(.15,dt)}
@@ -1360,16 +1510,17 @@ function step(dt,now){
   if(swim&&Math.random()<dt*6&&mag>.02)spawnP(me.x,0.2,me.z,(Math.random()-.5)*2,2,(Math.random()-.5)*2,.25,0xcff3ff,.5,8);
   me.char.position.set(me.x,me.y,me.z);me.char.rotation.y=me.face;animChar(me.char,me.speed,dt,!me.grounded);me.char.userData.sh.visible=me.y>-.5;
   if(me.ko>0){const k=me.ko,o=me.char;o.rotation.x=k>1.5?(2.4-k)*8:lerp(-Math.PI/2,0,clamp((.6-k)/.6,0,1)*1)*(k>.0?1:0);if(k<=.05)o.rotation.x=0}else me.char.rotation.x=0;
-  if(now<me.eatUntil)me.char.userData.ra.rotation.x=-2.2+Math.sin(now*.02)*.4;if(JOB&&JOB.carry){me.char.userData.la.rotation.x=-1.25;me.char.userData.ra.rotation.x=-1.25}
+  if(now<me.eatUntil)me.char.userData.ra.rotation.x=-2.2+Math.sin(now*.02)*.4;if(JOB&&JOB.carry){me.char.userData.la.rotation.x=-1.25;me.char.userData.ra.rotation.x=-1.25}myPose(now);
   if(me.popT>0){me.popT-=dt;const q=Math.sin(me.popT*20)*.1;me.char.scale.set(1.05*(1+q),1.05*(1-q),1.05*(1+q))}else me.char.scale.setScalar(1.05)}
  if(sayIdx>=0&&now>sayUntil){sayIdx=-1;setBubble(me.char,-1);sendPresence(true)}
  sendPresence(false);
- me.inside=me.car?null:houseAt(me.x,me.z);me.lab.visible=!me.inside&&!(me.car&&!me.car.g.userData.two);updateBots(dt,now);updateTraffic(dt);updateDoors(dt);updatePet(dt,now);if(JOB)updateJob(dt,now);checkPeerHits(now);if(OUT.length)evTimeouts(now);
+ me.inside=me.car?null:houseAt(me.x,me.z);me.lab.visible=!me.inside&&!me.ride&&!(me.car&&!me.car.g.userData.two);updateBots(dt,now);updateTraffic(dt);updateDoors(dt);updatePet(dt,now);if(JOB)updateJob(dt,now);checkPeerHits(now);if(OUT.length)evTimeouts(now);combatStep(dt,now);updateCops(dt,now);if(me.rob)updRob(dt,now);
  for(let i=anims.length-1;i>=0;i--){if(anims[i](now,dt))anims.splice(i,1)}
  if(me.nearC&&Math.random()<dt*22){const c=me.nearC,a=Math.random()*TAU;spawnP(c.x,c.h+4.8,c.z,Math.cos(a)*1.9,5.2,Math.sin(a)*1.9,.2,0xa9e6f5,.95,9)}
  if(G.taxi){const t=G.taxi;if(Math.hypot(t.x-me.x,t.z-me.z)<52&&me.car&&Math.abs(me.car.speed)<24)endTaxi(true)}
  const lp=1-Math.pow(.0009,dt);peers.forEach(p=>{if(!p.has||!p.obj)return;if(p.w!==W.id){p.obj.visible=false;p.car.visible=false;return}p.x=lerp(p.x,p.tx,lp);p.y=lerp(p.y,p.ty,lp);p.z=lerp(p.z,p.tz,lp);const dr=Math.atan2(Math.sin(p.tr-p.r),Math.cos(p.tr-p.r));p.r+=dr*lp;
-  p.obj.visible=!p.v;p.car.visible=!!p.v;if(p.v){p.car.position.set(p.x,p.y,p.z);p.car.rotation.y=p.r;p.car.userData.wh.forEach(w=>w.children[0].rotation.x+=p.sp*dt*1.5);p.lab.position.y=5;p.car.add(p.lab)}else{p.lab.position.y=3.75;p.obj.add(p.lab);p.obj.position.set(p.x,p.y,p.z);p.obj.rotation.y=p.r;animChar(p.obj,p.sp,dt,false)}});
+  if(p.rd){p.obj.visible=false;p.car.visible=false;const host=p.rd===myId&&me.car?me.car.g:(peerById(p.rd)||{}).car;if(host){p.lab.position.set(0,(4.4+(p.st||1)*.9)/1.15,0);if(p.lab.parent!==host)host.add(p.lab)}return}
+  p.obj.visible=!p.v;p.car.visible=!!p.v;if(p.v){p.car.position.set(p.x,p.y,p.z);p.car.rotation.y=p.r;p.car.userData.wh.forEach(w=>w.children[0].rotation.x+=p.sp*dt*1.5);p.lab.position.y=5;p.car.add(p.lab)}else{p.lab.position.y=3.75;p.obj.add(p.lab);p.obj.position.set(p.x,p.y,p.z);p.obj.rotation.y=p.r;animChar(p.obj,p.sp,dt,false);peerPose(p,performance.now())}});
  for(let i=0;i<coinPos.length;i++){const c=coinPos[i];if(c.got)continue;const dx=c.x-me.x,dz=c.z-me.z;if(dx*dx+dz*dz<(me.car?22:8)){c.got=true;G.coins.add(coinKey(i));addMoney(25);burst(c.x,c.y,c.z,0xffc41f,10,5,.26);beep(980,.1);setTimeout(()=>beep(1320,.12),70)}}
  intT+=realDt;if(intT>=1){intT-=1;let ded=-1;G.debts.forEach(d=>{d.el=(d.el||0)+1;const k=Math.floor(d.el/180);if(k>(d.ik||0)){d.ik=k;d.amt=Math.min(d.amt*1.05,d.orig*1.5);toast('Qarz foizi: '+d.name+'ga endi '+Math.ceil(d.amt)+' tanga')}if(d.el>ded)ded=d.el});
   if(ded===1200)showCard('5 daq','Politsiya ogohlantiradi','Qarzingizni 5 daqiqada to‘lang, aks holda qamalasiz!');if(ded===1440){showCard('1 daq','Politsiya ogohlantiradi','1 daqiqa qoldi! Qarzni to‘lang.');siren(1)}if(ded>=1500&&!G.jail&&!me.arrest&&!FLY)startArrest();
@@ -1390,10 +1541,10 @@ function hudUpdate(){const a=regionAt(me.x,me.z);if(a.i!==me.region){const r=R[a
  else if(best)arrow(best.lx,best.lz,best.lm);
  else if(airports[0])arrow(airports[0].x,airports[0].z,'Aeroport: yangi davlatga uching');
  else{$('qArrow').hidden=true;$('qText').textContent='Hamma muhrlar yig‘ildi!'}
- const near=!me.car&&!me.enter&&carNear(),cb=$('carBtn');if(me.car){cb.hidden=false;cb.textContent='Tushish'}else if(near){cb.hidden=false;cb.textContent=near.g.userData.two?'Minish':'Mashina'}else cb.hidden=true;$('talkBtn').hidden=!nearBot;$('jump').textContent=me.car?'Signal':'Sakra';
- ctxMode='';const cx=$('ctxBtn');const nearAz=me.car&&azsList.find(q=>Math.hypot(q.x-me.x,q.z-me.z)<24)&&(me.car.fuel===undefined?100:me.car.fuel)<99;const sq=!me.car&&shops.find(q=>me.inside===q.store||Math.hypot(q.x-me.x,q.z-me.z)<8);const jc=JOB?jobCtx():'',scx=stairCtx();if(jc){ctxMode='job';cx.textContent=jc}else if(scx){ctxMode='stair';ctxStair=scx;cx.textContent=scx>0?'Yuqoriga':'Pastga'}else if(sq&&!(JOB&&JOB.id==='cashier'&&JOB.stage==='work')){ctxMode='shop';ctxStore=sq;cx.textContent='Do‘kon'}else if(G.jail){ctxMode='bail';cx.textContent='Garov'}else if(nearAz){ctxMode='fuel';cx.textContent='Benzin'}else if(!me.car&&nearAirport()){ctxMode='air';cx.textContent='Chipta'}else if(me.car&&taxiBot&&!G.taxi){ctxMode='taxi';cx.textContent='Taksi'}if(!ctxMode&&!me.car&&!G.jail){const pp=nearPeer();if(pp){ctxMode='peer';ctxPeer=pp;cx.textContent='Do‘st'}}cx.hidden=!ctxMode;
- $('nEn').textContent=Math.round(G.energy)+'%';$('spd').hidden=!me.car;if(me.car)$('spd').textContent=Math.round(Math.abs(me.car.speed)*3)+' km/s · benzin '+Math.round(me.car.fuel===undefined?100:me.car.fuel)+'%';{const dt0=G.debts.reduce((a,d)=>Math.max(a,d.el||0),0),rm=Math.max(0,1500-dt0);$('nDebt').textContent=debtTotal().toLocaleString('ru-RU')+' · '+Math.floor(rm/60)+':'+String(rm%60).padStart(2,'0')}if(G.jail){$('qArrow').hidden=true;$('qText').textContent='Qamoq: '+Math.floor(G.jail.left/60)+':'+String(G.jail.left%60).padStart(2,'0')}peers.forEach(p=>{if(p.audio){const d=Math.hypot(p.x-me.x,p.z-me.z);p.audio.volume=p.w===W.id?clamp(1.15-d/110,0,1):0}});$('hint').hidden=true;updInLight();drawMini()}
-function updateCamera(dt){const d=me.inside?8.5:(me.car?18:15)*(innerHeight>innerWidth?1.15:1),n=performance.now();
+ const pcar=!me.car&&!me.ride&&!me.out?nearPeerCar():null,near0=!me.car&&!me.enter&&carNear(),near=pcar&&(!near0||Math.hypot(pcar.x-me.x,pcar.z-me.z)<=Math.hypot(near0.x-me.x,near0.z-me.z)+2.5)?null:near0,cb=$('carBtn');if(me.car||me.ride){cb.hidden=false;cb.textContent='Tushish'}else if(near){cb.hidden=false;cb.textContent=near.g.userData.two?'Minish':'Mashina'}else if(pcar){cb.hidden=false;cb.textContent='Yo‘lovchi'}else cb.hidden=true;$('talkBtn').hidden=!nearBot;$('jump').textContent=me.car?'Signal':'Sakra';
+ ctxMode='';const cx=$('ctxBtn');const nearAz=me.car&&azsList.find(q=>Math.hypot(q.x-me.x,q.z-me.z)<24)&&(me.car.fuel===undefined?100:me.car.fuel)<99;const sq=!me.car&&shops.find(q=>me.inside===q.store||Math.hypot(q.x-me.x,q.z-me.z)<8);const jc=JOB?jobCtx():'',scx=stairCtx();if(jc){ctxMode='job';cx.textContent=jc}else if(scx){ctxMode='stair';ctxStair=scx;cx.textContent=scx>0?'Yuqoriga':'Pastga'}else if(ctxRob=robCtx()){ctxMode='rob';cx.textContent='O‘marish'}else if(sq&&!(JOB&&JOB.id==='cashier'&&JOB.stage==='work')){ctxMode='shop';ctxStore=sq;cx.textContent='Do‘kon'}else if(G.jail){ctxMode='dig';cx.textContent='Kovlash'}else if(nearAz){ctxMode='fuel';cx.textContent='Benzin'}else if(!me.car&&nearAirport()){ctxMode='air';cx.textContent='Chipta'}else if(me.car&&taxiBot&&!G.taxi){ctxMode='taxi';cx.textContent='Taksi'}if(!ctxMode&&!me.car&&!G.jail){const pp=nearPeer();if(pp){ctxMode='peer';ctxPeer=pp;cx.textContent='Do‘st'}}if(!ctxMode&&me.inside&&me.inside.owned&&!me.car&&!me.out){ctxMode='sleep';cx.textContent='Uxlash'}cx.hidden=!ctxMode;
+ $('nEn').textContent=Math.round(G.energy)+'%';$('nHp').textContent=Math.round(G.hp)+'%';$('atkBtn').hidden=!!(me.car||me.ride||G.jail||me.out);$('wpnBtn').hidden=!(G.guns[1]||G.guns[2])||!!me.car||!!me.ride;$('bailBtn').hidden=!G.jail;updWant();updDig();$('spd').hidden=!me.car;if(me.car)$('spd').textContent=Math.round(Math.abs(me.car.speed)*3)+' km/s · benzin '+Math.round(me.car.fuel===undefined?100:me.car.fuel)+'%';{const dt0=G.debts.reduce((a,d)=>Math.max(a,d.el||0),0),rm=Math.max(0,1500-dt0);$('nDebt').textContent=debtTotal().toLocaleString('ru-RU')+' · '+Math.floor(rm/60)+':'+String(rm%60).padStart(2,'0')}if(G.jail){$('qArrow').hidden=true;$('qText').textContent='Qamoq: '+Math.floor(G.jail.left/60)+':'+String(G.jail.left%60).padStart(2,'0')+' · tunnel '+Math.round(G.jail.dig||0)+'%'}if(me.rob){$('qText').textContent='Kassa ochilmoqda… '+Math.round(me.rob.t/5*100)+'%'}peers.forEach(p=>{if(p.audio){const d=Math.hypot(p.x-me.x,p.z-me.z);p.audio.volume=p.w===W.id?clamp(1.15-d/110,0,1):0}});$('hint').hidden=true;updInLight();drawMini()}
+function updateCamera(dt){const d=me.inside?8.5:(me.car||me.ride?18:15)*(innerHeight>innerWidth?1.15:1),n=performance.now();
  if(me.car&&n-cam.touched>1400&&Math.abs(me.car.speed)>3){let target=me.car.h+(me.car.speed<0?Math.PI:0),dd=Math.atan2(Math.sin(target-cam.yaw),Math.cos(target-cam.yaw));cam.yaw+=dd*Math.min(1,dt*2.6)}
  const fx=Math.sin(cam.yaw),fz=Math.cos(cam.yaw),cp=Math.cos(cam.pitch),sp=Math.sin(cam.pitch),ty=me.y+(me.car?3.2:3);
  let free=1;if(!me.inside)for(let q=1;q<=8;q++){const t=q/8,px=me.x-fx*cp*d*t,pz=me.z-fz*cp*d*t,py=ty+sp*d*t,h0=houseAt(px,pz);if(h0&&py<h0.y+h0.H+2){free=Math.max(.2,(q-1)/8);break}}
@@ -1402,15 +1553,25 @@ function updateCamera(dt){const d=me.inside?8.5:(me.car?18:15)*(innerHeight>inne
  const k=free<1||me.inside?1:1-Math.pow(.00002,dt);cam.x=lerp(cam.x,x,k);cam.y=lerp(cam.y,y,k);cam.z=lerp(cam.z,z,k);const h=me.inside;if(h)camInside(h);let sx=0,sy=0;if(shake>0){shake=Math.max(0,shake-dt*1.5);sx=(Math.random()-.5)*shake*1.6;sy=(Math.random()-.5)*shake*1.6}camera.position.set(cam.x+sx,cam.y+sy,cam.z);camera.lookAt(me.x,ty,me.z)}
 
 // ---------- Boshlash ----------
-const colWrap=$('cols');COLS.slice(0,6).forEach((c,i)=>{const b=document.createElement('button');b.style.background='#'+c.toString(16).padStart(6,'0');b.setAttribute('aria-label','Rang '+(i+1));b.className=i===G.color?'sel':'';b.addEventListener('click',()=>{G.color=i;[...colWrap.children].forEach((q,k)=>q.className=k===i?'sel':'')});colWrap.append(b)});
+const PRESETS=[['Talaba',{fem:0,c:1,h:1,g:0,p:2,sk:0}],['Biznesmen',{fem:0,c:6,h:-1,g:1,p:0,sk:1}],['Sportchi',{fem:0,c:0,h:-1,g:2,p:0,sk:3}],['Talaba qiz',{fem:1,c:9,h:-1,g:0,p:2,sk:2}],['Shifokor',{fem:1,c:7,h:8,g:1,p:0,sk:0}],['Usta',{fem:0,c:5,h:7,g:0,p:1,sk:4}]];let prevChar=null,presSel=-1;
+function chips(id,items,isSel,fn){const w=$(id);w.textContent='';items.forEach(([lab,v,bg])=>{const b=document.createElement('button');b.type='button';b.textContent=lab;if(bg){b.style.background=bg;b.classList.add('sw');b.setAttribute('aria-label','Rang')}if(isSel(v))b.classList.add('sel');b.addEventListener('click',()=>{fn(v);renderStart();beep(700,.04)});w.append(b)})}
+function renderStart(){const o=G.o;chips('pres',PRESETS.map((p,i)=>[p[0],i]),v=>v===presSel,i=>{const s=PRESETS[i][1];presSel=i;o.fem=s.fem;G.color=s.c;o.h=s.h;o.g=s.g;o.p=s.p;o.sk=s.sk});
+ chips('sexB',[['Erkak',0],['Ayol',1]],v=>(o.fem?1:0)===v,v=>{o.fem=v;presSel=-1;if(!v&&o.h===8)o.h=-1});
+ chips('cols',COLS.map((c,i)=>['',i,'#'+c.toString(16).padStart(6,'0')]),v=>v===G.color,v=>{G.color=v;presSel=-1});
+ chips('skinB',[[2,0xf4cfa9],[0,0xf1c49a],[1,0xe5b184],[3,0xc98e62],[4,0x8d5a3b]].map(a=>['',a[0],'#'+a[1].toString(16)]),v=>v===(o.sk===undefined?0:o.sk),v=>{o.sk=v;presSel=-1});
+ chips('hatB',(o.fem?[['Soch',-1],['Ro‘mol',8],['Kepka',1],['Shlyapa',7]]:[['Soch',-1],['Do‘ppi',0],['Kepka',1],['Shlyapa',7]]),v=>v===(o.h===undefined?-1:o.h),v=>{o.h=v;presSel=-1});
+ chips('glB',[['Yo‘q',0],['Oddiy',1],['Qora',2]],v=>v===(o.g|0),v=>{o.g=v;presSel=-1});
+ chips('qB',[['Past',0],['O‘rta',1],['Yuqori',2]],v=>v===G.q,v=>{G.q=v;applyQ()});updPreview()}
+function updPreview(){if(started||!W||!byId[W.start]||building)return;if(prevChar)scene.remove(prevChar);prevChar=makeChar(G.color,G.o.fem?1:0,false,G.o);const s=byId[W.start],x=s.x-Math.sin(s.ldir)*14,z=s.z-Math.cos(s.ldir)*14;prevChar.position.set(x,groundAt(x,z),z);prevChar.rotation.y=s.ldir+Math.PI+.3;scene.add(prevChar)}
+applyQ();renderStart();
 $('name').value=G.name;setSnd();
 requestAnimationFrame(tick);
-build(G.world).then(()=>{setCounts();const P=$('play');P.disabled=false;P.textContent=(G.stamps.size||G.coins.size)?'Sayohatni davom ettirish':'Yo‘lga chiqish';window.__game={myId,get OUT(){return OUT},giveMoney,proposeFam,peerById,sendEv,teamOf,jobKey,modal,checkPeerHits,camera,get JOB(){return JOB},startJob,endJob,jobAct,houseLayout,interiors,get dynCols(){return dynCols},startClimb,stairCtx,toW,toL,updateInteriors,parkSpots,startArrest,get jailSpot(){return jailSpot},get azsList(){return azsList},payBail,openShop,get net(){return net},get shadowsOn(){return shadowsOn},me,cam,get R(){return R},G,cars,teleport,tpTo,carToggle,peers,step,input,K,bots,houses,traffic,talkTo,get VILLAGES(){return VILLAGES},shops,airports,hitBot,openHit,buy,SHOP,flyTo,build,spawnAt,get W(){return W},refreshDebts,ctxAct,renderWallet,refreshChar,startTaxi,sectorMeshes,get nearBot(){return nearBot},set nearBot(b){nearBot=b},get dayT(){return dayT},set dayT(v){dayT=v}}}).catch(e=>{console.error(e);$('play').textContent='Dunyoni qurib bo‘lmadi'});
+build(G.world).then(()=>{setCounts();const P=$('play');P.disabled=false;P.textContent=(G.stamps.size||G.coins.size)?'Davom ettirish':'O‘ynash';updPreview();window.__game={attack,startRob,digTap,escapeJail,sleepHome,crime,get cops(){return cops},enterRide,exitRide,nearPeerCar,nextWpn,applyQ,takeDmg,renderStart,myId,get OUT(){return OUT},giveMoney,proposeFam,peerById,sendEv,teamOf,jobKey,modal,checkPeerHits,camera,get JOB(){return JOB},startJob,endJob,jobAct,houseLayout,interiors,get dynCols(){return dynCols},startClimb,stairCtx,toW,toL,updateInteriors,parkSpots,startArrest,get jailSpot(){return jailSpot},get azsList(){return azsList},payBail,openShop,get net(){return net},get shadowsOn(){return shadowsOn},me,cam,get R(){return R},G,cars,teleport,tpTo,carToggle,peers,step,input,K,bots,houses,traffic,talkTo,get VILLAGES(){return VILLAGES},shops,airports,hitBot,openHit,buy,SHOP,flyTo,build,spawnAt,get W(){return W},refreshDebts,ctxAct,renderWallet,refreshChar,startTaxi,sectorMeshes,get nearBot(){return nearBot},set nearBot(b){nearBot=b},get dayT(){return dayT},set dayT(v){dayT=v}}}).catch(e=>{console.error(e);$('play').textContent='Dunyoni qurib bo‘lmadi'});
 $('play').addEventListener('click',()=>{G.name=($('name').value||'').trim().slice(0,14)||'Yo‘lchi';$('name').blur();
  try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}
- me.char=makeChar(G.color,0,false,G.o);scene.add(me.char);const lab=labelSprite(G.name+(G.fam?' ♥':''),'#'+COLS[G.color].toString(16).padStart(6,'0'),G.color===7?'#10204a':'#ffffff');lab.position.y=3.75;me.char.add(lab);me.lab=lab;
+ me.char=makeChar(G.color,G.o.fem?1:0,false,G.o);scene.add(me.char);const lab=labelSprite(G.name+(G.fam?' ♥':''),'#'+COLS[G.color].toString(16).padStart(6,'0'),G.color===7?'#10204a':'#ffffff');lab.position.y=3.75;me.char.add(lab);me.lab=lab;
  const pos=G.pos[W.id];spawnAt(null);if(G.jail&&jailSpot){me.x=jailSpot.x;me.z=jailSpot.z;me.y=groundAt(me.x,me.z)+.5}else if(pos&&Number.isFinite(pos[0])&&(G.stamps.size||G.coins.size)){me.x=pos[0];me.z=pos[1];me.y=groundAt(me.x,me.z)+.5;cam.x=me.x;cam.z=me.z;cam.y=me.y+8}
- $('start').hidden=true;['top','side','acts'].forEach(i=>$(i).hidden=false);started=true;refreshDebts();setCounts();makePet();persist();initRoom();
+ if(prevChar){scene.remove(prevChar);prevChar=null}$('start').hidden=true;['top','side','acts'].forEach(i=>$(i).hidden=false);started=true;setGun(me.char,G.wsel);updWpn();updWant();refreshDebts();setCounts();makePet();persist();initRoom();
  try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
  setInterval(persist,8000)});
 addEventListener('pagehide',persist);
